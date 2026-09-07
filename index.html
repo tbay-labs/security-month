@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#003152">
+    <title>Tbay Security Month Challenge</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+                    colors: {
+                        tbNavy: '#003152',
+                        tbDark: '#00203a',
+                        tbCyan: '#00cccc',
+                        tbCyanDark: '#046f70',
+                        tbWarn: '#f0b93f',
+                        tbSurface: '#f3f8f9'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #00203a;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+        
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #f3f8f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+
+        .header-safe-area {
+            padding-top: max(16px, env(safe-area-inset-top));
+        }
+
+        /* Custom Scrollbar for Tasks */
+        .task-scroll::-webkit-scrollbar { width: 0px; }
+        
+        /* Toast Notification */
+        #toast {
+            position: fixed;
+            top: max(20px, env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+            width: 90%;
+            max-width: 400px;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Streak Timeline Dots */
+        .streak-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            position: relative;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+        .streak-dot.active { background: #00cccc; color: #00203a; box-shadow: 0 0 10px rgba(0,204,204,0.5); }
+        .streak-dot.locked { background: #ffffff; color: #94a3b8; border: 2px solid #e2e8f0; }
+        .streak-dot.completed { background: #10b981; color: white; border: 2px solid #10b981; }
+        
+        .streak-line {
+            position: absolute;
+            top: 30px; 
+            left: 16px;
+            right: 16px;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 0;
+        }
+        .streak-line-fill {
+            height: 100%;
+            background: #10b981;
+            transition: width 0.5s ease;
+        }
+
+        /* Form Elements */
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            font-family: inherit;
+            font-size: 16px; 
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: #00cccc;
+        }
+        
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-upload-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        /* Multiple Image Upload Preview */
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .preview-img-container {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+        .preview-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .remove-img-btn {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Modal Animation */
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-animate { animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        /* New Dot States */
+        .streak-dot.missed { background: #fef08a; color: #b45309; border: 2px solid #f59e0b; opacity: 1; }
+        .streak-dot.ring-active { box-shadow: 0 0 0 4px #ffffff, 0 0 0 7px #00cccc; }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="bg-tbDark text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 border-l-4 border-tbCyan">
+        <span id="toast-msg" class="font-semibold text-sm"></span>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-[320px] w-full overflow-hidden shadow-2xl modal-animate">
+            <div class="flex justify-between items-center p-4 border-b border-gray-100">
+                <h3 class="font-bold text-tbDark">How to find your ID</h3>
+                <button onclick="toggleHelpModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:bg-gray-200 transition">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-4 bg-gray-50 flex justify-center">
+                <!-- Helper Image -->
+                <img src="referral_guide.jpg" alt="How to copy referral code" class="max-h-[50vh] object-contain rounded-xl shadow-sm border border-gray-200">
+            </div>
+            <div class="p-4">
+                <button onclick="toggleHelpModal()" class="w-full bg-tbCyan text-tbDark font-bold py-3 rounded-xl active:scale-95 transition">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div id="tnc-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-[340px] w-full overflow-hidden shadow-2xl modal-animate">
+            <div class="flex justify-between items-center p-5 border-b border-gray-100">
+                <h3 class="font-bold text-tbDark text-lg">Terms & Conditions</h3>
+                <button onclick="toggleTncModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:bg-gray-200 transition">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-5 max-h-[50vh] overflow-y-auto text-sm text-gray-600 space-y-4">
+                <p><strong>1. Campaign Period:</strong> Starts September 8th, 2026, and ends September 14th, 2026.</p>
+                <p><strong>2. Reward Distribution:</strong> All rewards, including coins and the Grand Prize coupons, will be calculated and released to eligible user accounts on <strong>17/09/2026</strong>.</p>
+                <p><strong>3. Streaks & Missed Tasks:</strong> If you miss a task on its scheduled day, you can still complete it later to qualify for the Grand Prize. However, your daily check-in streak will be reset to 1.</p>
+                <p><strong>4. Eligibility:</strong> Only valid Tbay users who successfully submit legitimate screenshots and answers will qualify for rewards.</p>
+            </div>
+            <div class="p-4 border-t border-gray-100">
+                <button onclick="toggleTncModal()" class="w-full bg-tbSurface border border-gray-200 text-tbDark font-bold py-3 rounded-xl active:bg-gray-100 transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rewards Info Modal -->
+    <div id="rewards-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-[340px] w-full overflow-hidden shadow-2xl modal-animate">
+            <div class="flex justify-between items-center p-5 border-b border-gray-100">
+                <h3 class="font-bold text-tbDark text-lg">Campaign Rewards</h3>
+                <button onclick="toggleRewardsModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:bg-gray-200 transition">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                
+                <!-- Diamond (7 Tasks) -->
+                <div class="bg-gradient-to-br from-[#c0f2f5] via-[#e6fbff] to-[#80deea] p-4 rounded-xl text-tbDark border border-[#80deea]/60 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/50 blur-xl rounded-full pointer-events-none"></div>
+                    <p class="text-[10px] font-black uppercase opacity-70 mb-0.5 tracking-wider">Complete 7 Tasks</p>
+                    <p class="text-2xl font-black">₦250,000</p>
+                    <p class="text-xs font-bold opacity-80 mt-1">In high-value trading coupons.</p>
+                </div>
+                
+                <!-- Platinum (6 Tasks) -->
+                <div class="bg-gradient-to-br from-[#e2e8f0] via-[#f8fafc] to-[#cbd5e1] p-4 rounded-xl text-slate-800 border border-slate-300/60 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/60 blur-xl rounded-full pointer-events-none"></div>
+                    <p class="text-[10px] font-black uppercase opacity-60 mb-0.5 tracking-wider">Complete 6 tasks</p>
+                    <p class="text-2xl font-black">₦100,000</p>
+                    <p class="text-xs font-bold opacity-70 mt-1">In high-value trading coupons.</p>
+                </div>
+
+                <!-- Gold (5 Tasks) -->
+                <div class="bg-gradient-to-br from-[#fde047] via-[#fef9c3] to-[#f59e0b] p-4 rounded-xl text-yellow-900 border border-yellow-500/50 shadow-sm relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/60 blur-xl rounded-full pointer-events-none"></div>
+                    <p class="text-[10px] font-black uppercase opacity-70 mb-0.5 tracking-wider">Complete 5 tasks</p>
+                    <p class="text-2xl font-black">₦50,000</p>
+                    <p class="text-xs font-bold opacity-80 mt-1">In high-value trading coupons.</p>
+                </div>
+
+                <div class="bg-tbWarn/10 border border-tbWarn/30 p-3 rounded-xl flex items-center gap-3">
+                    <div class="text-tbWarn text-2xl drop-shadow-sm">🪙</div>
+                    <div>
+                        <p class="text-sm font-bold text-yellow-800">Daily Coins</p>
+                        <p class="text-[11px] text-yellow-700 leading-snug mt-0.5">Earn up to 100 coins daily to use in gift card trading. <strong>1 Coin = 1 Naira</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- Combined Header & Hero Section -->
+        <div class="header-safe-area bg-tbNavy px-6 pb-12 relative overflow-hidden rounded-b-[32px] shadow-sm shrink-0">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-tbCyan rounded-full opacity-10 blur-2xl pointer-events-none"></div>
+            
+            <!-- Header -->
+            <div class="flex items-center justify-center relative pb-6 pt-2 z-50 min-h-[44px]">
+                <button id="back-btn" onclick="closeAppPage()" class="hidden absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20 transition">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                
+                <img id="tbay-logo" src="https://mcusercontent.com/4ceda90aa48260f0c3c397068/images/3089e9cb-945f-b383-b957-d5175b3d8c39.png" alt="Tbay" class="h-7 brightness-0 invert">
+            </div>
+
+            <!-- Hero Content -->
+            <div class="relative z-10 text-center">
+                <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Loading Dates...</span>
+                <h1 class="text-3xl font-black text-white mb-2 leading-tight flex items-center justify-center gap-2">
+                    Security Month
+                    <button onclick="toggleTncModal()" class="text-tbCyan bg-white/10 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold border border-tbCyan/50 active:bg-white/20 transition shrink-0" aria-label="Information">?</button>
+                </h1>
+                <p class="text-white/80 text-sm mb-4">Complete daily tasks to learn how to trade safely and avoid scammers.</p>
+                
+                <div onclick="toggleRewardsModal()" class="bg-gradient-to-r from-tbCyan to-blue-500 rounded-xl p-3 shadow-lg border border-white/20 cursor-pointer active:scale-95 transition hover:shadow-xl group">
+                    <div class="flex justify-between items-center text-left">
+                        <div>
+                            <p class="text-tbDark font-black text-xs uppercase mb-0.5">Complete all 7 tasks to win</p>
+                            <p class="text-white font-black text-2xl">₦250,000 in Coupons</p>
+                        </div>
+                        <div class="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 px-6 -mt-6 relative z-20 flex flex-col pb-8 task-scroll overflow-y-auto">
+            
+            <!-- VIEW 1: Registration Form -->
+            <div id="view-register" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+                <h2 class="text-xl font-bold text-tbDark mb-2">Welcome!</h2>
+                <p class="text-gray-500 text-sm mb-6">To track your progress and send your rewards, please enter your Tbay referral code.</p>
+                
+                <div class="mb-6">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Your Referral Code</label>
+                    <input type="text" id="referral-input" placeholder="e.g. 83GF5q" autocapitalize="characters">
+                    <div class="flex justify-between items-start mt-2">
+                        <p class="text-xs text-gray-400">Find this in your Tbay app under Profile.</p>
+                        <button onclick="toggleHelpModal()" class="text-xs text-tbCyanDark font-bold underline shrink-0 ml-2 active:opacity-70">How to copy it?</button>
+                    </div>
+                </div>
+
+                <button onclick="registerUser()" id="btn-register" class="w-full bg-tbCyan text-tbDark font-bold py-4 rounded-xl active:scale-95 transition flex justify-center items-center gap-2">
+                    <span>Start My Streak</span>
+                    <div class="loader" id="loader-register"></div>
+                </button>
+            </div>
+
+            <!-- VIEW 2: Dashboard & Task Container -->
+            <div id="view-dashboard" class="hidden flex-col gap-6">
+                
+                <!-- Pending Alert (Optimized solid card) -->
+                <div id="pending-alert" class="hidden bg-white rounded-2xl shadow-xl p-5 items-start gap-4 border-t-4 border-tbWarn relative z-20">
+                    <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center shrink-0 border border-yellow-100">
+                        <span class="text-lg drop-shadow-sm">⚠️</span>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-yellow-800 text-sm">Missed Tasks Available</h4>
+                        <p class="text-xs text-gray-600 mt-1 leading-relaxed">You have <span id="pending-count" class="font-bold text-yellow-700 text-sm"></span> pending task(s) from previous days. Click the yellow dots below to complete them and stay eligible for the Grand Prize!</p>
+                    </div>
+                </div>
+
+                <!-- Streak Timeline -->
+                <div class="bg-white rounded-2xl shadow-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-tbDark">Your Streak: <span id="streak-count" class="text-tbCyanDark">0</span></h3>
+                        <span id="total-coins" class="text-tbCyanDark font-bold bg-tbCyan/10 px-3 py-1 rounded-full text-sm">0 Coins</span>
+                    </div>
+                    
+                    <div class="relative pt-4 pb-8 px-2 overflow-visible">
+                        <div class="streak-line"><div class="streak-line-fill" id="streak-fill" style="width: 0%;"></div></div>
+                        <div class="flex justify-between relative z-10" id="streak-dots-container">
+                            <!-- Dots generated by JS -->
+                        </div>
+                    </div>
+                    <p class="text-center text-xs text-gray-400 font-semibold mt-2" id="streak-message">Click an unlocked day to view the task.</p>
+                </div>
+
+                <!-- Active Task Card -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 border-t-4 border-tbCyan transition-all" id="task-card">
+                    <!-- Task content injected here -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-tbDark text-white pt-8 pb-12 px-6 shrink-0 mt-auto rounded-t-3xl">
+            <h4 class="text-center font-bold text-sm mb-4 text-white/60 uppercase tracking-widest">Official Channels</h4>
+            <div class="flex justify-center gap-4 mb-8">
+                <!-- Social Icons -->
+                <a href="https://www.facebook.com/tbayofficial/" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
+                <a href="https://twitter.com/Theiabay" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+                <a href="https://www.instagram.com/tbay__official/" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg></a>
+                <a href="https://t.me/Tbayplatform/" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 008.217 11.411c.594.108.81-.258.81-.572v-2.185c-3.338.726-4.043-1.416-4.043-1.416-.541-1.373-1.32-1.74-1.32-1.74-1.079-.738.082-.723.082-.723 1.192.083 1.82 1.224 1.82 1.224 1.059 1.815 2.775 1.29 3.453.987.108-.767.414-1.291.752-1.587-2.665-.303-5.466-1.332-5.466-5.93 0-1.31.467-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.218.688.822.572A12 12 0 0024 12c0-6.627-5.373-12-11.944-12z"/></svg></a>
+                <a href="https://www.tiktok.com/@tbayapp" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.41-3.24-3.46-5.62-.02-1.58.51-3.16 1.48-4.36 1.15-1.4 2.87-2.28 4.69-2.45v4.05c-.88.1-1.74.52-2.35 1.15-.65.65-.96 1.58-.87 2.49.09 1.05.69 2 1.56 2.53.86.53 1.95.66 2.92.42 1.12-.31 1.98-1.21 2.25-2.32.12-.48.16-1 .15-1.51-.02-3.84-.01-7.68-.02-11.52v-5.83z"/></svg></a>
+            </div>
+            
+            <div class="flex gap-4 pb-safe">
+                <!-- App Store -->
+                <button onclick="closeOrRedirect()" class="flex-1 bg-white/10 py-3 rounded-xl flex items-center justify-center gap-2 active:bg-white/20">
+                    <img src="apple_icon.png" alt="App Store" class="w-5 h-5 object-contain brightness-0 invert">
+                    <span class="text-xs font-bold">App Store</span>
+                </button>
+                <!-- Play Store -->
+                <button onclick="closeOrRedirect()" class="flex-1 bg-white/10 py-3 rounded-xl flex items-center justify-center gap-2 active:bg-white/20">
+                    <img src="play_icon.png" alt="Google Play" class="w-5 h-5 object-contain brightness-0 invert">
+                    <span class="text-xs font-bold">Google Play</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyjytTN7tdg2ERrpLitPP-VVD8-3mu6kNJR2PGwjnF1DXQvEJ3AQrRYpq5FrpbSeVMB/exec"; 
+        
+        // Define Campaign Start and End Dates (Use ISO format with +01:00 to enforce Nigerian Time / WAT)
+        const CAMPAIGN_START = "2026-09-07T00:00:00+01:00"; 
+        const CAMPAIGN_END = "2026-09-14T23:59:59+01:00";
+        
+        const COIN_REWARDS = [10, 10, 20, 40, 50, 60, 100];
+        
+        // OS Detection
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        if (isIOS) { 
+            document.getElementById('back-btn').style.display = 'flex'; 
+            document.getElementById('tbay-logo').style.display = 'none';
+        }
+
+        let user = {
+            id: null, code: null, completedTasks: [], streak: 0, coins: 0, lastPlayed: null
+        };
+        let viewingDayIndex = 0; 
+        let selectedFiles = []; 
+
+        // --- TASKS DEFINITION ---
+        const TASKS = [
+            {
+                day: 1,
+                title: "Follow Our Official Channels",
+                desc: "Stay updated and safe! Follow Tbay on our official social media channels. Upload up to 5 screenshots to prove it.",
+                type: "social_upload",
+                channels: [
+                    { name: 'Facebook', url: 'https://www.facebook.com/tbayofficial/', color: 'bg-blue-600' },
+                    { name: 'Twitter (X)', url: 'https://twitter.com/Theiabay', color: 'bg-black' },
+                    { name: 'Instagram', url: 'https://www.instagram.com/tbay__official/', color: 'bg-pink-600' },
+                    { name: 'Telegram', url: 'https://t.me/Tbayplatform/', color: 'bg-blue-500' },
+                    { name: 'TikTok', url: 'https://www.tiktok.com/@tbayapp', color: 'bg-gray-900' }
+                ]
+            },
+            {
+                day: 2,
+                title: "The WhatsApp Warning",
+                desc: "Tbay support will NEVER ask you to trade via WhatsApp. Scammers use WhatsApp to steal your cards.",
+                type: "checkbox",
+                checkboxLabel: "I promise I will never trade with anyone pretending to be a Tbay rep on WhatsApp or outside the app."
+            },
+            {
+                day: 3,
+                title: "Password & PIN Safety",
+                desc: "When was the last time you changed your Tbay transaction PIN and login password?",
+                type: "radio",
+                options: ["Less than 6 months ago", "More than 6 months ago"],
+                validate: (val) => {
+                    if(val === "More than 6 months ago") return { actionRequired: true, msg: "To complete this task and earn your coins, you must open the Tbay app and update BOTH your login password and transaction PIN right now.", btn: "Change Passwords to Complete Task" };
+                    return { actionRequired: false, msg: "Great job! Changing your passwords regularly keeps your funds safe." };
+                }
+            },
+            {
+                day: 4,
+                title: "Spot the Genuine Platforms",
+                desc: "Which of the following are GENUINE platforms where Tbay operates? (Select all that apply)",
+                type: "multi",
+                options: ["iOS App Store", "Android Play Store", "Telegram Mini App", "WhatsApp Trade Bot"],
+                correct: [0, 1, 2], 
+                errorMsg: "Oops! Tbay does NOT trade via WhatsApp. Uncheck it and try again."
+            },
+            {
+                day: 5,
+                title: "Enable 2FA Protection",
+                desc: "Two-Factor Authentication (2FA) adds a critical layer of security to your account. Is your 2FA currently enabled?",
+                type: "radio",
+                options: ["Yes, it is enabled", "No, it is not enabled"],
+                validate: (val) => {
+                    if(val === "No, it is not enabled") return { actionRequired: true, msg: "Please go to your Profile Security settings and enable Google Authenticator now.", btn: "Go to Security Settings" };
+                    return { actionRequired: false, msg: "Excellent! 2FA keeps hackers out even if they get your password." };
+                }
+            },
+            {
+                day: 6,
+                title: "Read the Homepage Banner",
+                desc: "Go to the Tbay app homepage, read the banner about impersonators, and come back here. Tell us your understanding of why we put that banner there.",
+                type: "textarea"
+            },
+            {
+                day: 7,
+                title: "Spread the Word",
+                desc: "Download the security poster below, share it on your WhatsApp status to warn your friends, and upload a screenshot here.",
+                type: "poster_upload",
+                posterUrl: "tbay_poster.png"
+            }
+        ];
+
+        // --- UTILITY FUNCTIONS ---
+        function toggleHelpModal() { document.getElementById('help-modal').classList.toggle('hidden'); }
+        function toggleTncModal() { document.getElementById('tnc-modal').classList.toggle('hidden'); }
+        function toggleRewardsModal() { document.getElementById('rewards-modal').classList.toggle('hidden'); }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('#toast-msg').innerText = msg;
+            toast.style.borderColor = isError ? '#e74c3c' : '#00cccc';
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function closeAppPage() {
+            if (isIOS) {
+                if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.closeWebview) {
+                    window.webkit.messageHandlers.closeWebview.postMessage("");
+                } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.close) {
+                    window.webkit.messageHandlers.close.postMessage("");
+                } else {
+                    window.history.back();
+                }
+            } else {
+                window.location.href = 'http://dl.tbay.store/';
+            }
+        }
+
+        function closeOrRedirect() { closeAppPage(); }
+
+        // Always get the current date specifically in Nigerian Time (WAT)
+        function getTodayString() {
+            const lagosTimeStr = new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" });
+            const dateObj = new Date(lagosTimeStr);
+            return `${dateObj.getFullYear()}-${dateObj.getMonth()+1}-${dateObj.getDate()}`;
+        }
+
+        function getCampaignDay() {
+            // Absolute timestamps handle timezones automatically when calculating the difference
+            const startDate = new Date(CAMPAIGN_START);
+            const now = new Date();
+            const diffTime = now - startDate;
+            
+            if (diffTime < 0) return -1; // Campaign has not started yet
+            
+            // 24 hours exactly in milliseconds
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            return Math.min(diffDays, 6); // Max out at index 6 (Day 7)
+        }
+
+        function uuidv4() {
+            return 'tbay_sec_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+        }
+
+        // --- IMAGE COMPRESSION ---
+        function compressImage(file, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const MAX_SIZE = 800;
+                    let width = img.width; let height = img.height;
+                    if (width > height && width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } 
+                    else if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                    canvas.width = width; canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                    callback(dataUrl.split(',')[1]);
+                }
+            }
+        }
+
+        function init() {
+            // Dynamically set the header badge based on config
+            const startD = new Date(CAMPAIGN_START);
+            const endD = new Date(CAMPAIGN_END);
+            const startStr = startD.toLocaleDateString('en-GB', { month: 'short', day: '2-digit' });
+            const endStr = endD.toLocaleDateString('en-GB', { month: 'short', day: '2-digit', year: 'numeric' });
+            document.getElementById('campaign-date-badge').innerText = `${startStr} - ${endStr}`;
+
+            const storedUser = localStorage.getItem('tbay_security_user');
+            if (storedUser) {
+                user = JSON.parse(storedUser);
+                if (!user.completedTasks) user.completedTasks = []; 
+                document.getElementById('view-register').classList.add('hidden');
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('view-dashboard').classList.add('flex');
+                
+                const campDay = getCampaignDay();
+                viewingDayIndex = Math.max(0, campDay); // Default to viewing Day 1 even if locked
+                
+                // Find earliest uncompleted task up to the current unlocked day
+                for (let i = 0; i <= campDay; i++) {
+                    if (!user.completedTasks.includes(i)) { viewingDayIndex = i; break; }
+                }
+                
+                renderDashboard();
+            }
+        }
+
+        async function registerUser() {
+            const code = document.getElementById('referral-input').value.trim();
+            if(!code) return showToast('Please enter your referral code.', true);
+            const btn = document.getElementById('btn-register');
+            const loader = document.getElementById('loader-register');
+            btn.disabled = true; loader.style.display = 'block';
+            user.id = uuidv4();
+            user.code = code;
+            user.completedTasks = [];
+            try {
+                fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'register', id: user.id, code: user.code }), mode: 'no-cors' }).catch(()=>{});
+                localStorage.setItem('tbay_security_user', JSON.stringify(user));
+                showToast('Welcome to Security Month!');
+                setTimeout(() => {
+                    document.getElementById('view-register').classList.add('hidden');
+                    document.getElementById('view-dashboard').classList.remove('hidden');
+                    document.getElementById('view-dashboard').classList.add('flex');
+                    
+                    const campDay = getCampaignDay();
+                    viewingDayIndex = Math.max(0, campDay);
+                    renderDashboard();
+                }, 500);
+            } catch(e) {
+                btn.disabled = false; loader.style.display = 'none';
+                showToast('Something went wrong. Try again.', true);
+            }
+        }
+
+        function selectDay(index) {
+            const campDay = getCampaignDay();
+            if (index > campDay) {
+                const dayToUnlock = new Date(CAMPAIGN_START);
+                dayToUnlock.setDate(dayToUnlock.getDate() + index);
+                const dateString = dayToUnlock.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                return showToast(`Day ${index + 1} task unlocks on ${dateString}.`, true);
+            }
+            viewingDayIndex = index;
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            const campDay = getCampaignDay();
+            document.getElementById('total-coins').innerText = `${user.coins} Coins`;
+            document.getElementById('streak-count').innerText = user.streak;
+            const container = document.getElementById('streak-dots-container');
+            container.innerHTML = '';
+            let pendingCount = 0;
+
+            for(let i=0; i<7; i++) {
+                let isUnlocked = i <= campDay;
+                let isCompleted = user.completedTasks.includes(i);
+                let isPending = isUnlocked && !isCompleted;
+                if (isPending && i < campDay) pendingCount++;
+
+                let statusClass = 'locked';
+                if (isCompleted) statusClass = 'completed';
+                else if (isPending && i < campDay) statusClass = 'missed';
+                else if (isPending && i === campDay) statusClass = 'active';
+                if (!isUnlocked) statusClass = 'locked !bg-gray-50 !text-gray-300';
+
+                let ringClass = i === viewingDayIndex ? 'ring-active' : '';
+                let cursorClass = isUnlocked ? 'cursor-pointer hover:scale-110' : 'cursor-not-allowed';
+                let dot = document.createElement('button');
+                dot.className = `streak-dot ${statusClass} ${ringClass} ${cursorClass} transition-all focus:outline-none`;
+                dot.innerText = isCompleted ? '✓' : (i+1);
+                dot.onclick = () => selectDay(i);
+                
+                let coinTag = document.createElement('div');
+                coinTag.className = `absolute -bottom-6 text-[10px] whitespace-nowrap ${i === viewingDayIndex ? 'text-tbCyan font-bold' : 'text-gray-400'}`;
+                coinTag.innerText = isCompleted ? 'Done' : `+${COIN_REWARDS[i]}`;
+                dot.appendChild(coinTag);
+                container.appendChild(dot);
+            }
+            
+            let fillPct = (Math.max(0, Math.min(campDay, 6)) / 6) * 100;
+            document.getElementById('streak-fill').style.width = `${fillPct}%`;
+            
+            const alertBox = document.getElementById('pending-alert');
+            if (pendingCount > 0) {
+                alertBox.classList.remove('hidden');
+                alertBox.classList.add('flex');
+                document.getElementById('pending-count').innerText = pendingCount;
+            } else { 
+                alertBox.classList.add('hidden'); 
+                alertBox.classList.remove('flex');
+            }
+            renderTask(viewingDayIndex);
+        }
+
+        function renderTask(dayIndex) {
+            const task = TASKS[dayIndex];
+            const card = document.getElementById('task-card');
+            selectedFiles = []; 
+            
+            if (dayIndex > getCampaignDay()) {
+                card.innerHTML = `<div class="py-8 text-center"><div class="text-4xl mb-3">🔒</div><h3 class="font-bold text-gray-500">This task unlocks on Day ${dayIndex + 1}.</h3></div>`;
+                return;
+            }
+
+            if (user.completedTasks.includes(dayIndex)) {
+                let completedHtml = `
+                    <div class="py-6 text-center">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white shadow-sm">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        </div>
+                        <h3 class="text-xl font-black text-tbDark mb-1">Task Completed!</h3>
+                        <p class="text-sm text-gray-500 mb-4">You earned ${COIN_REWARDS[dayIndex]} Coins for this task.</p>
+                `;
+                if (task.type === "radio" || task.type === "checkbox" || task.type === "multi") {
+                     completedHtml += `<div class="bg-tbSurface rounded-xl p-4 mb-4 text-left border border-gray-200"><p class="text-xs font-bold text-gray-400 uppercase mb-1">Your Submission</p><p class="text-sm text-tbDark font-semibold">Answer recorded successfully.</p></div>`;
+                }
+                completedHtml += `<button onclick="closeOrRedirect()" class="text-tbCyanDark font-bold text-sm bg-tbSurface py-2 px-6 rounded-full border border-gray-200 active:scale-95 transition">Return to App</button></div>`;
+                card.innerHTML = completedHtml;
+                return;
+            }
+
+            let html = `
+                <div class="mb-4">
+                    <span class="text-tbCyan font-bold text-xs uppercase tracking-widest">Day ${task.day} Task</span>
+                    <h3 class="text-xl font-black text-tbDark mt-1">${task.title}</h3>
+                    <p class="text-sm text-gray-500 mt-2 leading-relaxed">${task.desc}</p>
+                </div>
+                <div id="task-input-area" class="mb-6">
+            `;
+
+            if (task.type === "social_upload") {
+                html += `<div class="grid grid-cols-1 gap-2 mb-4">`;
+                task.channels.forEach(ch => {
+                    html += `<a href="${ch.url}" target="_blank" rel="noopener noreferrer" class="${ch.color} text-white font-bold py-3 px-4 rounded-xl text-center active:scale-95 transition block shadow-sm border border-black/10">${ch.name}</a>`;
+                });
+                html += `</div>
+                    <div class="file-upload-wrapper bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-100 transition">
+                        <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <p class="text-sm font-semibold text-gray-600">Tap to select up to 5 screenshots</p>
+                        <input type="file" id="task-file-multi" accept="image/*" multiple onchange="handleMultiFileSelect(this)">
+                    </div>
+                    <div id="multi-preview-container" class="preview-grid hidden"></div>
+                    <p id="multi-file-error" class="text-xs text-red-500 mt-2 hidden"></p>`;
+            }
+            else if (task.type === "upload" || task.type === "poster_upload") {
+                if(task.type === "poster_upload") {
+                    html += `
+                        <div class="bg-tbSurface rounded-xl p-4 mb-4 text-center">
+                            <img src="${task.posterUrl}" class="rounded-lg shadow max-h-48 mx-auto mb-3">
+                            <a href="${task.posterUrl}" download="Tbay_Security_Poster.png" class="text-tbCyanDark font-bold text-sm underline active:opacity-70">Download Image</a>
+                        </div>
+                    `;
+                }
+                html += `
+                    <div class="file-upload-wrapper bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-100 transition">
+                        <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <p class="text-sm font-semibold text-gray-600" id="file-name-display">Tap to select screenshot</p>
+                        <input type="file" id="task-file" accept="image/*" onchange="document.getElementById('file-name-display').innerText = this.files[0] ? this.files[0].name : 'Tap to select screenshot'">
+                    </div>
+                `;
+            } 
+            else if (task.type === "checkbox") {
+                html += `
+                    <label class="flex items-start gap-3 p-4 bg-tbSurface rounded-xl border border-gray-200">
+                        <input type="checkbox" id="task-check" class="mt-1 w-5 h-5 accent-tbCyan rounded cursor-pointer">
+                        <span class="text-sm font-semibold text-tbDark">${task.checkboxLabel}</span>
+                    </label>
+                `;
+            }
+            else if (task.type === "radio") {
+                task.options.forEach((opt, idx) => {
+                    html += `
+                        <label class="flex items-center gap-3 p-4 bg-tbSurface rounded-xl border border-gray-200 mb-2 cursor-pointer transition active:bg-gray-100">
+                            <input type="radio" name="task-radio" value="${opt}" class="w-5 h-5 accent-tbCyan">
+                            <span class="text-sm font-semibold text-tbDark">${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `<div id="radio-feedback" class="hidden mt-4 p-4 rounded-xl text-sm font-bold"></div>`;
+            }
+            else if (task.type === "multi") {
+                task.options.forEach((opt, idx) => {
+                    html += `
+                        <label class="flex items-center gap-3 p-4 bg-tbSurface rounded-xl border border-gray-200 mb-2 cursor-pointer transition active:bg-gray-100">
+                            <input type="checkbox" name="task-multi" value="${idx}" class="w-5 h-5 accent-tbCyan rounded">
+                            <span class="text-sm font-semibold text-tbDark">${opt}</span>
+                        </label>
+                    `;
+                });
+            }
+            else if (task.type === "textarea") {
+                html += `<button onclick="closeOrRedirect()" class="w-full bg-tbSurface text-tbNavy font-bold py-3 rounded-xl mb-4 border border-gray-200 active:scale-95 transition">Go to App Homepage</button>`;
+                html += `<textarea id="task-text" rows="4" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-tbCyan/30" placeholder="Type your answer here..."></textarea>`;
+            }
+
+            html += `</div>`; 
+            html += `<button onclick="handleTaskSubmit(${dayIndex})" id="btn-submit-task" class="w-full bg-tbCyan text-tbDark font-bold py-4 rounded-xl active:scale-95 transition flex justify-center items-center gap-2">
+                        <span>Submit Task</span>
+                        <div class="loader" id="loader-task"></div>
+                    </button>`;
+            card.innerHTML = html;
+        }
+
+        function handleMultiFileSelect(input) {
+            const container = document.getElementById('multi-preview-container');
+            const errorMsg = document.getElementById('multi-file-error');
+            const maxFiles = 5;
+            errorMsg.classList.add('hidden');
+            const newFiles = Array.from(input.files);
+            
+            if (selectedFiles.length + newFiles.length > maxFiles) {
+                errorMsg.innerText = `You can only upload a maximum of ${maxFiles} screenshots.`;
+                errorMsg.classList.remove('hidden');
+                input.value = ''; 
+                return;
+            }
+            selectedFiles = [...selectedFiles, ...newFiles];
+            updateMultiPreview(container);
+            input.value = ''; 
+        }
+
+        function updateMultiPreview(container) {
+            container.innerHTML = '';
+            if (selectedFiles.length > 0) { container.classList.remove('hidden'); } else { container.classList.add('hidden'); }
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'preview-img-container';
+                    previewDiv.innerHTML = `<img src="${e.target.result}" alt="preview"><div class="remove-img-btn" onclick="removeSelectedFile(${index})">✕</div>`;
+                    container.appendChild(previewDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function removeSelectedFile(index) {
+            selectedFiles.splice(index, 1);
+            updateMultiPreview(document.getElementById('multi-preview-container'));
+        }
+
+        function handleTaskSubmit(dayIndex) {
+            const task = TASKS[dayIndex];
+            let payloadData = "";
+            let filesToProcess = [];
+
+            if (task.type === "social_upload") {
+                if (selectedFiles.length === 0) return showToast('Please select at least one screenshot.', true);
+                if (selectedFiles.length > 5) return showToast('Maximum 5 screenshots allowed.', true);
+                filesToProcess = selectedFiles;
+            }
+            else if (task.type === "upload" || task.type === "poster_upload") {
+                const fileInput = document.getElementById('task-file');
+                if(!fileInput.files.length) return showToast('Please select a screenshot to upload.', true);
+                filesToProcess = [fileInput.files[0]];
+            } 
+            else if (task.type === "checkbox") {
+                if(!document.getElementById('task-check').checked) return showToast('You must agree to continue.', true);
+                payloadData = "Agreed";
+            }
+            else if (task.type === "radio") {
+                const selected = document.querySelector('input[name="task-radio"]:checked');
+                if(!selected) return showToast('Please select an option.', true);
+                
+                const validation = task.validate(selected.value);
+                const feedback = document.getElementById('radio-feedback');
+                
+                if(validation.actionRequired) {
+                    feedback.className = "mt-4 p-4 rounded-xl text-sm font-bold bg-tbWarn/20 text-yellow-800 block border border-tbWarn/30";
+                    feedback.innerHTML = `${validation.msg} <button onclick="markCompleteAndRedirect(${dayIndex}, '${selected.value}')" class="mt-3 w-full bg-tbWarn text-tbDark py-3 font-bold rounded-xl active:scale-95 transition shadow-sm">${validation.btn}</button>`;
+                    document.getElementById('task-input-area').innerHTML = `<div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center"><p class="text-gray-500 text-sm">You selected: <span class="font-bold text-tbDark">${selected.value}</span></p></div>` + feedback.outerHTML;
+                    document.getElementById('btn-submit-task').style.display = 'none';
+                    return; 
+                } else {
+                    payloadData = selected.value;
+                }
+            }
+            else if (task.type === "multi") {
+                const checkboxes = document.querySelectorAll('input[name="task-multi"]');
+                let selectedIdx = [];
+                checkboxes.forEach(cb => { if(cb.checked) selectedIdx.push(parseInt(cb.value)); });
+                
+                let isCorrect = selectedIdx.length === task.correct.length && selectedIdx.every(val => task.correct.includes(val));
+                if(!isCorrect) return showToast(task.errorMsg, true);
+                payloadData = "Spotted Genuine Platforms";
+            }
+            else if (task.type === "textarea") {
+                const text = document.getElementById('task-text').value.trim();
+                if(text.length < 10) return showToast('Please write a bit more about your understanding.', true);
+                payloadData = text;
+            }
+
+            finalizeTaskSubmission(dayIndex, payloadData, filesToProcess);
+        }
+
+        function markCompleteAndRedirect(dayIndex, data) {
+            finalizeTaskSubmission(dayIndex, data, [], true);
+        }
+
+        function finalizeTaskSubmission(dayIndex, textData, filesData, redirectAfter = false) {
+            const btn = document.getElementById('btn-submit-task');
+            const loader = document.getElementById('loader-task');
+            if(btn) { btn.disabled = true; loader.style.display = 'block'; }
+
+            const processFiles = (files, compressedBase64Array, callback) => {
+                if (files.length === 0) { callback(compressedBase64Array); return; }
+                const fileToProcess = files.shift();
+                compressImage(fileToProcess, (base64Img) => {
+                    compressedBase64Array.push(base64Img);
+                    processFiles(files, compressedBase64Array, callback);
+                });
+            };
+
+            const executeGAS = (base64Images) => {
+                const payload = { action: 'submitTask', id: user.id, code: user.code, day: dayIndex + 1, data: textData, images: base64Images };
+                fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' }).catch(()=>{});
+                
+                user.completedTasks.push(dayIndex);
+                user.coins += COIN_REWARDS[dayIndex];
+                
+                // Calculate streak using strict Nigerian Time
+                const todayStr = getTodayString();
+                
+                const lagosTimeStr = new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" });
+                let lagosDate = new Date(lagosTimeStr);
+                lagosDate.setDate(lagosDate.getDate() - 1);
+                const yesterdayStr = `${lagosDate.getFullYear()}-${lagosDate.getMonth()+1}-${lagosDate.getDate()}`;
+                
+                if (user.lastPlayed !== todayStr) {
+                    if (user.lastPlayed === yesterdayStr) { user.streak++; } 
+                    else { user.streak = 1; }
+                    user.lastPlayed = todayStr;
+                }
+                
+                localStorage.setItem('tbay_security_user', JSON.stringify(user));
+                
+                if(redirectAfter) { closeOrRedirect(); } 
+                else { showToast('Task Completed! Coins added.'); setTimeout(renderDashboard, 800); }
+            };
+
+            if (filesData && filesData.length > 0) { processFiles([...filesData], [], executeGAS); } 
+            else { executeGAS([]); }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
