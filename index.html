@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#003152">
-    <title>Tbay Security Month Challenge</title>
+    <title>September Security Streak - Week 1</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -193,6 +193,17 @@
         /* New Dot States */
         .streak-dot.missed { background: #ffffff; color: #b45309; border: 2px solid #f59e0b; opacity: 1; }
         .streak-dot.ring-active { box-shadow: 0 0 0 4px #ffffff, 0 0 0 7px #00cccc; }
+        
+        /* Smooth height transitions */
+        .shrink-header { padding-bottom: 24px !important; }
+
+        /* Disabled Button State */
+        button:disabled {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            transform: scale(1) !important;
+            box-shadow: none !important;
+        }
     </style>
 </head>
 <body>
@@ -215,6 +226,9 @@
                 <!-- Helper Image -->
                 <img src="referral_guide.jpg" alt="How to copy referral code" class="max-h-[50vh] object-contain rounded-xl shadow-sm border border-gray-200">
             </div>
+            <div class="px-5 pt-4 pb-2">
+                <p class="text-sm text-gray-600 leading-relaxed text-center">To copy the referral code, go to the <strong>Profile</strong> section in the app and tap on the copy symbol next to your referral code at the top.</p>
+            </div>
             <div class="p-4">
                 <button onclick="toggleHelpModal()" class="w-full bg-tbCyan text-tbDark font-bold py-3 rounded-xl active:scale-95 transition">Got it</button>
             </div>
@@ -225,16 +239,29 @@
     <div id="tnc-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
         <div class="bg-white rounded-3xl max-w-[340px] w-full overflow-hidden shadow-2xl modal-animate">
             <div class="flex justify-between items-center p-5 border-b border-gray-100">
-                <h3 class="font-bold text-tbDark text-lg">Terms & Conditions</h3>
+                <h3 class="font-bold text-tbDark text-lg">Campaign Details</h3>
                 <button onclick="toggleTncModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:bg-gray-200 transition">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div class="p-5 max-h-[50vh] overflow-y-auto text-sm text-gray-600 space-y-4">
-                <p><strong>1. Campaign Period:</strong> Starts September 8th, 2026, and ends September 14th, 2026.</p>
-                <p><strong>2. Reward Distribution:</strong> All rewards, including coins and the Grand Prize coupons, will be calculated and released to eligible user accounts on <strong>17/09/2026</strong>.</p>
-                <p><strong>3. Streaks & Missed Tasks:</strong> If you miss a task on its scheduled day, you can still complete it later to qualify for the Grand Prize. However, your daily check-in streak will be reset to 1.</p>
-                <p><strong>4. Eligibility:</strong> Only valid Tbay users who successfully submit legitimate screenshots and answers will qualify for rewards.</p>
+            <div class="p-5 max-h-[60vh] overflow-y-auto text-sm text-gray-600 space-y-5">
+                <div>
+                    <h4 class="font-bold text-tbDark mb-1.5">What is this campaign?</h4>
+                    <p class="leading-relaxed">The September Security Streak is a week-long event to educate users on safe trading practices, rewarding you with daily coins and a chance to win up to ₦250,000 in coupons.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-tbDark mb-1.5">How it works</h4>
+                    <p class="leading-relaxed">Complete one security task each day. Collect coins for eligible on-time tasks, which are credited on the reward distribution date. Complete all 7 tasks to qualify for the Grand Prize.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-tbDark mb-1.5">Terms & Conditions</h4>
+                    <ul class="space-y-3 mt-2">
+                        <li><strong>1. Campaign Period:</strong> Starts September 8th, 2026, and ends September 14th, 2026.</li>
+                        <li><strong>2. Reward Distribution:</strong> All rewards, including coins and the Grand Prize coupons, will be calculated and released to eligible user accounts on <strong>17/09/2026</strong>.</li>
+                        <li><strong>3. Streaks & Missed Tasks:</strong> You only earn coins and a streak check-in by completing the active day's task. If you miss a task, you can still complete it later to qualify for the Grand Prize, but it will award 0 coins.</li>
+                        <li><strong>4. Eligibility:</strong> Only valid Tbay users who successfully submit legitimate screenshots and answers will qualify for rewards.</li>
+                    </ul>
+                </div>
             </div>
             <div class="p-4 border-t border-gray-100">
                 <button onclick="toggleTncModal()" class="w-full bg-tbSurface border border-gray-200 text-tbDark font-bold py-3 rounded-xl active:bg-gray-100 transition">Close</button>
@@ -288,39 +315,60 @@
         </div>
     </div>
 
+    <!-- Change Code Modal -->
+    <div id="change-code-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-[320px] w-full overflow-hidden shadow-2xl modal-animate">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-tbDark text-lg">Change Referral Code</h3>
+                <button onclick="cancelChangeCode()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 active:bg-gray-200 transition">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-5">
+                <p class="text-sm text-gray-600 mb-4">You have <span id="chances-left-display" class="font-bold text-tbWarn">3</span> chances left to change your code.</p>
+                <input type="text" id="change-referral-input" placeholder="Enter new code" autocapitalize="characters" class="mb-4">
+                <button onclick="submitCodeChange()" id="btn-submit-change" class="w-full bg-tbCyan text-tbDark font-bold py-3 rounded-xl active:scale-95 transition flex justify-center items-center gap-2">
+                    <span>Update Code</span>
+                    <div class="loader" id="loader-change"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container">
         
         <!-- Combined Header & Hero Section -->
-        <div class="header-safe-area bg-tbNavy px-6 pb-12 relative overflow-hidden rounded-b-[32px] shadow-sm shrink-0">
+        <div id="main-header" class="header-safe-area bg-tbNavy px-6 pb-12 relative overflow-hidden rounded-b-[32px] shadow-sm shrink-0 transition-all duration-300">
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-tbCyan rounded-full opacity-10 blur-2xl pointer-events-none"></div>
             
             <!-- Header -->
-            <div class="flex items-center justify-center relative pb-6 pt-2 z-50 min-h-[44px]">
+            <div id="logo-container" class="flex items-center justify-center relative pb-6 pt-2 z-50 min-h-[44px]">
                 <button id="back-btn" onclick="closeAppPage()" class="hidden absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20 transition">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                 </button>
                 
-                <img id="tbay-logo" src="https://mcusercontent.com/4ceda90aa48260f0c3c397068/images/3089e9cb-945f-b383-b957-d5175b3d8c39.png" alt="Tbay" class="h-7 brightness-0 invert">
+                <!-- Logo hidden by default, shown via JS if not iOS -->
+                <img id="tbay-logo" src="https://mcusercontent.com/4ceda90aa48260f0c3c397068/images/3089e9cb-945f-b383-b957-d5175b3d8c39.png" alt="Tbay" class="h-7 brightness-0 invert hidden">
             </div>
 
             <!-- Hero Content -->
-            <div class="relative z-10 text-center">
-                <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Loading Dates...</span>
+            <div id="hero-intro" class="relative z-10 text-center">
+                <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Week 1 | Loading...</span>
                 <h1 class="text-3xl font-black text-white mb-2 leading-tight flex items-center justify-center gap-2">
-                    Security Month
+                    Security Streak
                     <button onclick="toggleTncModal()" class="text-tbCyan bg-white/10 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold border border-tbCyan/50 active:bg-white/20 transition shrink-0" aria-label="Information">?</button>
                 </h1>
                 <p class="text-white/80 text-sm mb-4">Complete daily tasks to learn how to trade safely and avoid scammers.</p>
+            </div>
                 
-                <div onclick="toggleRewardsModal()" class="bg-gradient-to-r from-tbCyan to-blue-500 rounded-xl p-3 shadow-lg border border-white/20 cursor-pointer active:scale-95 transition hover:shadow-xl group">
-                    <div class="flex justify-between items-center text-left">
-                        <div>
-                            <p class="text-tbDark font-black text-xs uppercase mb-0.5">Complete all 7 tasks to win</p>
-                            <p class="text-white font-black text-2xl">₦250,000 in Coupons</p>
-                        </div>
-                        <div class="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                        </div>
+            <div onclick="toggleRewardsModal()" class="relative z-10 bg-gradient-to-r from-tbCyan to-blue-500 rounded-xl p-3 shadow-lg border border-white/20 cursor-pointer active:scale-95 transition hover:shadow-xl group">
+                <div class="flex justify-between items-center text-left">
+                    <div>
+                        <p class="text-tbDark font-black text-xs uppercase mb-0.5">Complete all 7 tasks to win</p>
+                        <p class="text-white font-black text-2xl">₦250,000 in Coupons</p>
+                    </div>
+                    <div class="text-white bg-white/20 rounded-full w-8 h-8 flex items-center justify-center shrink-0 group-hover:bg-white/30 transition">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                     </div>
                 </div>
             </div>
@@ -336,14 +384,13 @@
                 
                 <div class="mb-6">
                     <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Your Referral Code</label>
-                    <input type="text" id="referral-input" placeholder="e.g. 83GF5q" autocapitalize="characters">
-                    <div class="flex justify-between items-start mt-2">
-                        <p class="text-xs text-gray-400">Find this in your Tbay app under Profile.</p>
-                        <button onclick="toggleHelpModal()" class="text-xs text-tbCyanDark font-bold underline shrink-0 ml-2 active:opacity-70">How to copy it?</button>
+                    <div class="relative">
+                        <input type="text" id="referral-input" placeholder="e.g. 83GF5q" autocapitalize="characters" style="padding-right: 105px;" oninput="document.getElementById('btn-register').disabled = this.value.trim().length === 0">
+                        <button onclick="toggleHelpModal()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-tbCyan/15 text-tbCyanDark text-[11px] font-bold px-3 py-1.5 rounded-lg active:scale-95 transition whitespace-nowrap">How to find?</button>
                     </div>
                 </div>
 
-                <button onclick="registerUser()" id="btn-register" class="w-full bg-tbCyan text-tbDark font-bold py-4 rounded-xl active:scale-95 transition flex justify-center items-center gap-2">
+                <button onclick="registerUser()" id="btn-register" class="w-full bg-tbCyan text-tbDark font-bold py-4 rounded-xl active:scale-95 transition flex justify-center items-center gap-2" disabled>
                     <span>Start My Streak</span>
                     <div class="loader" id="loader-register"></div>
                 </button>
@@ -352,6 +399,12 @@
             <!-- VIEW 2: Dashboard & Task Container -->
             <div id="view-dashboard" class="hidden flex-col gap-6">
                 
+                <!-- Simple Referral Code Display -->
+                <div class="text-center text-sm text-gray-500 relative z-20 mt-8 mb-2">
+                    Registered referral code: <span id="dash-ref-code-span" class="font-bold text-tbDark">XXXXXX</span>
+                    <button onclick="promptChangeCode()" class="ml-2 text-tbCyanDark font-black uppercase text-xs tracking-wider active:opacity-70 transition hover:underline">Change</button>
+                </div>
+
                 <!-- Pending Alert -->
                 <div id="pending-alert" class="hidden bg-white rounded-2xl shadow-xl p-5 items-start gap-4 border-t-4 border-tbWarn relative z-20">
                     <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center shrink-0 border border-yellow-100">
@@ -359,7 +412,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-yellow-800 text-sm">Missed Tasks Available</h4>
-                        <p class="text-xs text-gray-600 mt-1 leading-relaxed">You have <span id="pending-count" class="font-bold text-yellow-700 text-sm"></span> pending task(s) from previous days. Click the yellow dots below to complete them and stay eligible for the Grand Prize!</p>
+                        <p class="text-xs text-gray-600 mt-1 leading-relaxed">You have <span id="pending-count" class="font-bold text-yellow-700 text-sm"></span> pending task(s) from previous days. Complete them to stay eligible for the Grand Prize (0 coins awarded for late tasks).</p>
                     </div>
                 </div>
 
@@ -410,17 +463,22 @@
                     <span class="text-xs font-bold">Google Play</span>
                 </button>
             </div>
+            
+            <!-- Campaign Details Text Link -->
+            <div class="mt-8 text-center text-[11.5px] text-white/50 leading-relaxed px-2">
+                Want to learn more about how to win and the rules? <button onclick="toggleTncModal()" class="text-tbCyan underline active:text-white transition focus:outline-none">Read the campaign details & terms</button>.
+            </div>
         </div>
 
     </div>
 
     <script>
         // --- CONFIGURATION ---
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyjytTN7tdg2ERrpLitPP-VVD8-3mu6kNJR2PGwjnF1DXQvEJ3AQrRYpq5FrpbSeVMB/exec"; 
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbx7y0de0aZ8Nrf4GWZVKyZ1-D4V5WSmmsMTkD9TQcUN2-i8Al-ptrryiFGkL5GNY_rj/exec"; 
         
         // Define Campaign Start and End Dates (Use ISO format with +01:00 to enforce Nigerian Time / WAT)
-        const CAMPAIGN_START = "2026-09-07T00:00:00+01:00"; 
-        const CAMPAIGN_END = "2026-09-14T23:59:59+01:00";
+        const CAMPAIGN_START = "2026-09-02T00:00:00+01:00"; 
+        const CAMPAIGN_END = "2026-09-07T23:59:59+01:00";
         
         const COIN_REWARDS = [10, 10, 20, 40, 50, 60, 100];
         
@@ -428,10 +486,12 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         if (isIOS) { 
             document.getElementById('back-btn').style.display = 'flex'; 
+        } else {
+            document.getElementById('tbay-logo').style.display = 'block';
         }
 
         let user = {
-            id: null, code: null, completedTasks: [], streak: 0, coins: 0, lastPlayed: null
+            id: null, code: null, completedTasks: [], streak: 0, coins: 0, lastPlayed: null, changesLeft: 3
         };
         let viewingDayIndex = 0; 
         let selectedFiles = []; 
@@ -464,7 +524,7 @@
                 type: "radio",
                 options: ["Less than 6 months ago", "More than 6 months ago"],
                 validate: (val) => {
-                    if(val === "More than 6 months ago") return { actionRequired: true, msg: "To complete this task and earn your coins, you must open the Tbay app and update BOTH your login password and transaction PIN right now.", btn: "Change Passwords to Complete Task" };
+                    if(val === "More than 6 months ago") return { actionRequired: true, msg: "To complete this task, you must open the Tbay app and update BOTH your login password and transaction PIN right now.", btn: "Change Passwords to Complete Task" };
                     return { actionRequired: false, msg: "Great job! Changing your passwords regularly keeps your funds safe." };
                 }
             },
@@ -584,7 +644,7 @@
             const endD = new Date(CAMPAIGN_END);
             const startStr = startD.toLocaleDateString('en-GB', { month: 'short', day: '2-digit' });
             const endStr = endD.toLocaleDateString('en-GB', { month: 'short', day: '2-digit', year: 'numeric' });
-            document.getElementById('campaign-date-badge').innerText = `${startStr} - ${endStr}`;
+            document.getElementById('campaign-date-badge').innerText = `Week 1 | ${startStr} - ${endStr}`;
 
             const storedUser = localStorage.getItem('tbay_security_user');
             if (storedUser) {
@@ -602,35 +662,142 @@
                     if (!user.completedTasks.includes(i)) { viewingDayIndex = i; break; }
                 }
                 
+                switchToDashboard();
                 renderDashboard();
+            }
+        }
+
+        function switchToDashboard() {
+            document.getElementById('view-register').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+            document.getElementById('view-dashboard').classList.add('flex');
+            
+            // Hide Hero Logo and Titles, shrink the header
+            document.getElementById('logo-container').style.display = 'none';
+            document.getElementById('hero-intro').style.display = 'none';
+            document.getElementById('main-header').classList.add('shrink-header');
+            
+            updateReferralUI();
+        }
+
+        function updateReferralUI() {
+            document.getElementById('dash-ref-code-span').innerText = user.code;
+        }
+
+        function promptChangeCode() {
+            if (user.changesLeft <= 0) {
+                return showToast('All 3 chances completed.', true);
+            }
+            document.getElementById('change-code-modal').classList.remove('hidden');
+            document.getElementById('chances-left-display').innerText = user.changesLeft;
+            document.getElementById('change-referral-input').value = user.code;
+        }
+
+        function cancelChangeCode() {
+            document.getElementById('change-code-modal').classList.add('hidden');
+        }
+
+        async function submitCodeChange() {
+            const newCode = document.getElementById('change-referral-input').value.trim();
+            if(!newCode) return showToast('Please enter a code.', true);
+            if(newCode.length !== 6) return showToast('Invalid referral code. Please check again.', true);
+            if(newCode === user.code) return cancelChangeCode();
+            if(user.changesLeft <= 0) return showToast('All 3 chances completed.', true);
+
+            const btn = document.getElementById('btn-submit-change');
+            const loader = document.getElementById('loader-change');
+            btn.disabled = true; loader.style.display = 'block';
+
+            try {
+                // Must use text/plain for Google Apps Script CORS redirects
+                const response = await fetch(GAS_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'changeCode', id: user.id, newCode: newCode }) 
+                });
+                
+                const result = await response.json();
+                
+                btn.disabled = false; loader.style.display = 'none';
+
+                if(result.status === 'error' && result.message === 'duplicate') {
+                    return showToast('This referral code is already being used by another user. Please reconfirm your code.', true);
+                }
+
+                if(result.status === 'success') {
+                    user.code = newCode;
+                    user.changesLeft--;
+                    localStorage.setItem('tbay_security_user', JSON.stringify(user));
+                    updateReferralUI();
+                    cancelChangeCode();
+                    showToast('Referral code updated successfully!');
+                }
+            } catch(e) {
+                btn.disabled = false; loader.style.display = 'none';
+                showToast('Network error while verifying code. Try again.', true);
             }
         }
 
         async function registerUser() {
             const code = document.getElementById('referral-input').value.trim();
+            
+            // 1. Check whether the code meets the exact 6 digits criteria
             if(!code) return showToast('Please enter your referral code.', true);
+            if(code.length !== 6) return showToast('Invalid referral code. Please check again.', true);
+            
+            // 2. Check if the browser storage already has a referral code
+            const storedUserRaw = localStorage.getItem('tbay_security_user');
+            if (storedUserRaw) {
+                const storedUser = JSON.parse(storedUserRaw);
+                if (storedUser && storedUser.code) {
+                    showToast('You are already registered! Loading dashboard...');
+                    init(); // Auto-load the dashboard
+                    return;
+                }
+            }
+            
             const btn = document.getElementById('btn-register');
             const loader = document.getElementById('loader-register');
             btn.disabled = true; loader.style.display = 'block';
-            user.id = uuidv4();
-            user.code = code;
-            user.completedTasks = [];
+            
+            // Only generate a new ID if one doesn't exist
+            if(!user.id) user.id = uuidv4();
+            user.changesLeft = 3; 
+            
+            // 3. Check the google sheet whether the code is already there
             try {
-                fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ action: 'register', id: user.id, code: user.code }), mode: 'no-cors' }).catch(()=>{});
-                localStorage.setItem('tbay_security_user', JSON.stringify(user));
-                showToast('Welcome to Security Month!');
-                setTimeout(() => {
-                    document.getElementById('view-register').classList.add('hidden');
-                    document.getElementById('view-dashboard').classList.remove('hidden');
-                    document.getElementById('view-dashboard').classList.add('flex');
+                // Must use text/plain for Google Apps Script CORS redirects
+                const response = await fetch(GAS_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: 'register', id: user.id, code: code }) 
+                });
+                
+                const result = await response.json();
+                
+                if(result.status === 'error' && result.message === 'duplicate') {
+                    btn.disabled = false; loader.style.display = 'none';
+                    return showToast('This code is already registered by another user. Please check your code.', true);
+                }
+
+                if(result.status === 'success') {
+                    user.code = code;
+                    user.completedTasks = [];
+                    // Store the code to the browser
+                    localStorage.setItem('tbay_security_user', JSON.stringify(user));
                     
-                    const campDay = getCampaignDay();
-                    viewingDayIndex = Math.max(0, campDay);
-                    renderDashboard();
-                }, 500);
+                    showToast('Welcome to Security Month!');
+                    setTimeout(() => {
+                        // Proceed to tasks
+                        switchToDashboard();
+                        const campDay = getCampaignDay();
+                        viewingDayIndex = Math.max(0, campDay);
+                        renderDashboard();
+                    }, 500);
+                }
             } catch(e) {
                 btn.disabled = false; loader.style.display = 'none';
-                showToast('Something went wrong. Try again.', true);
+                showToast('Network error while verifying code. Try again.', true);
             }
         }
 
@@ -674,7 +841,13 @@
                 dot.onclick = () => selectDay(i);
                 
                 let coinTag = document.createElement('div');
-                coinTag.className = `absolute -bottom-6 text-[10px] whitespace-nowrap ${i === viewingDayIndex ? 'text-tbCyan font-bold' : 'text-gray-400'}`;
+                let isMissed = isPending && i < campDay;
+                let textStyle = i === viewingDayIndex ? 'text-tbCyan font-bold' : 'text-gray-400';
+                
+                // Add the red strikethrough for missed tasks to show they are voided
+                if (isMissed) textStyle += ' line-through decoration-red-500 decoration-2 opacity-70';
+                
+                coinTag.className = `absolute -bottom-6 text-[10px] whitespace-nowrap transition-all ${textStyle}`;
                 coinTag.innerText = isCompleted ? 'Done' : `+${COIN_REWARDS[i]}`;
                 dot.appendChild(coinTag);
                 container.appendChild(dot);
@@ -712,38 +885,36 @@
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </div>
                         <h3 class="text-xl font-black text-tbDark mb-1">Task Completed!</h3>
-                        <p class="text-sm text-gray-500 mb-4">You earned ${COIN_REWARDS[dayIndex]} Coins for this task. All rewards will be credited on 17/09/2026.</p>
+                        <p class="text-sm text-gray-500 mb-4">Your completion has been recorded. Eligible rewards will be credited on 17/09/2026.</p>
+                    </div>
                 `;
-                if (task.type === "radio" || task.type === "checkbox" || task.type === "multi") {
-                     completedHtml += `<div class="bg-tbSurface rounded-xl p-4 mb-4 text-left border border-gray-200"><p class="text-xs font-bold text-gray-400 uppercase mb-1">Your Submission</p><p class="text-sm text-tbDark font-semibold">Answer recorded successfully.</p></div>`;
-                }
-                completedHtml += `<button onclick="closeOrRedirect()" class="text-tbCyanDark font-bold text-sm bg-tbSurface py-2 px-6 rounded-full border border-gray-200 active:scale-95 transition">Return to App</button></div>`;
                 card.innerHTML = completedHtml;
                 return;
             }
 
             let html = `
-                <div class="mb-4">
-                    <span class="text-tbCyan font-bold text-xs uppercase tracking-widest">Day ${task.day} Task</span>
-                    <h3 class="text-xl font-black text-tbDark mt-1">${task.title}</h3>
-                    <p class="text-sm text-gray-500 mt-2 leading-relaxed">${task.desc}</p>
+                <div class="mb-5">
+                    <span class="inline-block bg-tbCyan/10 text-tbCyanDark px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Day ${task.day}</span>
+                    <h2 class="text-xl font-bold text-tbDark mb-2">${task.title}</h2>
+                    <p class="text-gray-500 text-sm leading-relaxed">${task.desc}</p>
                 </div>
-                <div id="task-input-area" class="mb-6">
+                <div id="task-input-area" class="mb-4">
             `;
-
+            
             if (task.type === "social_upload") {
-                html += `<div class="grid grid-cols-1 gap-2 mb-4">`;
-                task.channels.forEach(ch => {
-                    html += `<a href="${ch.url}" target="_blank" rel="noopener noreferrer" class="${ch.color} text-white font-bold py-3 px-4 rounded-xl text-center active:scale-95 transition block shadow-sm border border-black/10">${ch.name}</a>`;
-                });
-                html += `</div>
+                html += `
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        ${task.channels.map(ch => `<a href="${ch.url}" target="_blank" class="${ch.color} text-white py-2 px-3 rounded-lg text-xs font-bold text-center flex items-center justify-center gap-2 active:scale-95 transition"><span>Follow on</span> ${ch.name}</a>`).join('')}
+                    </div>
                     <div class="file-upload-wrapper bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-100 transition">
                         <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        <p class="text-sm font-semibold text-gray-600">Tap to select up to 5 screenshots</p>
+                        <p class="text-sm font-semibold text-gray-600">Tap to select screenshots</p>
+                        <p class="text-xs text-gray-400 mt-1">Upload up to 5 images</p>
                         <input type="file" id="task-file-multi" accept="image/*" multiple onchange="handleMultiFileSelect(this)">
                     </div>
+                    <div id="multi-file-error" class="hidden mt-2 text-xs text-tbWarn font-bold text-center"></div>
                     <div id="multi-preview-container" class="preview-grid hidden"></div>
-                    <p id="multi-file-error" class="text-xs text-red-500 mt-2 hidden"></p>`;
+                `;
             }
             else if (task.type === "upload" || task.type === "poster_upload") {
                 if(task.type === "poster_upload") {
@@ -758,14 +929,14 @@
                     <div class="file-upload-wrapper bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:bg-gray-100 transition">
                         <svg class="mx-auto h-8 w-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                         <p class="text-sm font-semibold text-gray-600" id="file-name-display">Tap to select screenshot</p>
-                        <input type="file" id="task-file" accept="image/*" onchange="document.getElementById('file-name-display').innerText = this.files[0] ? this.files[0].name : 'Tap to select screenshot'">
+                        <input type="file" id="task-file" accept="image/*" onchange="document.getElementById('file-name-display').innerText = this.files[0] ? this.files[0].name : 'Tap to select screenshot'; validateCurrentTask()">
                     </div>
                 `;
             } 
             else if (task.type === "checkbox") {
                 html += `
                     <label class="flex items-start gap-3 p-4 bg-tbSurface rounded-xl border border-gray-200">
-                        <input type="checkbox" id="task-check" class="mt-1 w-5 h-5 accent-tbCyan rounded cursor-pointer">
+                        <input type="checkbox" id="task-check" class="mt-1 w-5 h-5 accent-tbCyan rounded cursor-pointer" onchange="validateCurrentTask()">
                         <span class="text-sm font-semibold text-tbDark">${task.checkboxLabel}</span>
                     </label>
                 `;
@@ -774,7 +945,7 @@
                 task.options.forEach((opt, idx) => {
                     html += `
                         <label class="flex items-center gap-3 p-4 bg-tbSurface rounded-xl border border-gray-200 mb-2 cursor-pointer transition active:bg-gray-100">
-                            <input type="radio" name="task-radio" value="${opt}" class="w-5 h-5 accent-tbCyan">
+                            <input type="radio" name="task-radio" value="${opt}" class="w-5 h-5 accent-tbCyan" onchange="validateCurrentTask()">
                             <span class="text-sm font-semibold text-tbDark">${opt}</span>
                         </label>
                     `;
@@ -785,7 +956,7 @@
                 task.options.forEach((opt, idx) => {
                     html += `
                         <label class="flex items-center gap-3 p-4 bg-tbSurface rounded-xl border border-gray-200 mb-2 cursor-pointer transition active:bg-gray-100">
-                            <input type="checkbox" name="task-multi" value="${idx}" class="w-5 h-5 accent-tbCyan rounded">
+                            <input type="checkbox" name="task-multi" value="${idx}" class="w-5 h-5 accent-tbCyan rounded" onchange="validateCurrentTask()">
                             <span class="text-sm font-semibold text-tbDark">${opt}</span>
                         </label>
                     `;
@@ -793,15 +964,44 @@
             }
             else if (task.type === "textarea") {
                 html += `<button onclick="closeOrRedirect()" class="w-full bg-tbSurface text-tbNavy font-bold py-3 rounded-xl mb-4 border border-gray-200 active:scale-95 transition">Go to App Homepage</button>`;
-                html += `<textarea id="task-text" rows="4" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-tbCyan/30" placeholder="Type your answer here..."></textarea>`;
+                html += `<textarea id="task-text" rows="4" class="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-tbCyan/30" placeholder="Type your answer here..." oninput="validateCurrentTask()"></textarea>`;
             }
 
             html += `</div>`; 
-            html += `<button onclick="handleTaskSubmit(${dayIndex})" id="btn-submit-task" class="w-full bg-tbCyan text-tbDark font-bold py-4 rounded-xl active:scale-95 transition flex justify-center items-center gap-2">
+            html += `<button onclick="handleTaskSubmit(${dayIndex})" id="btn-submit-task" class="w-full bg-tbCyan text-tbDark font-bold py-4 rounded-xl active:scale-95 transition flex justify-center items-center gap-2" disabled>
                         <span>Submit Task</span>
                         <div class="loader" id="loader-task"></div>
                     </button>`;
             card.innerHTML = html;
+        }
+
+        function validateCurrentTask() {
+            const task = TASKS[viewingDayIndex];
+            const btn = document.getElementById('btn-submit-task');
+            if(!btn) return;
+            
+            let isValid = false;
+
+            if (task.type === "social_upload") {
+                isValid = selectedFiles.length > 0 && selectedFiles.length <= 5;
+            } else if (task.type === "upload" || task.type === "poster_upload") {
+                const fileInput = document.getElementById('task-file');
+                isValid = fileInput && fileInput.files.length > 0;
+            } else if (task.type === "checkbox") {
+                const check = document.getElementById('task-check');
+                isValid = check && check.checked;
+            } else if (task.type === "radio") {
+                const radio = document.querySelector('input[name="task-radio"]:checked');
+                isValid = !!radio;
+            } else if (task.type === "multi") {
+                const checked = document.querySelectorAll('input[name="task-multi"]:checked');
+                isValid = checked.length > 0;
+            } else if (task.type === "textarea") {
+                const text = document.getElementById('task-text');
+                isValid = text && text.value.trim().length >= 10;
+            }
+            
+            btn.disabled = !isValid;
         }
 
         function handleMultiFileSelect(input) {
@@ -820,6 +1020,7 @@
             selectedFiles = [...selectedFiles, ...newFiles];
             updateMultiPreview(container);
             input.value = ''; 
+            validateCurrentTask();
         }
 
         function updateMultiPreview(container) {
@@ -840,6 +1041,7 @@
         function removeSelectedFile(index) {
             selectedFiles.splice(index, 1);
             updateMultiPreview(document.getElementById('multi-preview-container'));
+            validateCurrentTask();
         }
 
         function handleTaskSubmit(dayIndex) {
@@ -915,30 +1117,70 @@
             };
 
             const executeGAS = (base64Images) => {
-                const payload = { action: 'submitTask', id: user.id, code: user.code, day: dayIndex + 1, data: textData, images: base64Images };
-                fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload), mode: 'no-cors' }).catch(()=>{});
+                const campDay = getCampaignDay();
+                const isLate = dayIndex < campDay;
                 
-                user.completedTasks.push(dayIndex);
-                user.coins += COIN_REWARDS[dayIndex];
-                
-                // Calculate streak using strict Nigerian Time
+                let newStreak = user.streak;
+                let newCoins = user.coins;
                 const todayStr = getTodayString();
                 
-                const lagosTimeStr = new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" });
-                let lagosDate = new Date(lagosTimeStr);
-                lagosDate.setDate(lagosDate.getDate() - 1);
-                const yesterdayStr = `${lagosDate.getFullYear()}-${lagosDate.getMonth()+1}-${lagosDate.getDate()}`;
+                // Only grant coins and check-in streak if completed on the exact active day
+                if (!isLate) {
+                    newCoins += COIN_REWARDS[dayIndex];
+                    
+                    const lagosTimeStr = new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" });
+                    let lagosDate = new Date(lagosTimeStr);
+                    lagosDate.setDate(lagosDate.getDate() - 1);
+                    const yesterdayStr = `${lagosDate.getFullYear()}-${lagosDate.getMonth()+1}-${lagosDate.getDate()}`;
+                    
+                    if (user.lastPlayed !== todayStr) {
+                        if (user.lastPlayed === yesterdayStr) { newStreak++; } 
+                        else { newStreak = 1; }
+                    }
+                }
+
+                let newCompleted = [...user.completedTasks, dayIndex];
+
+                const payload = { 
+                    action: 'submitTask', 
+                    id: user.id, 
+                    code: user.code, 
+                    day: dayIndex + 1, 
+                    data: textData, 
+                    images: base64Images,
+                    streak: newStreak,
+                    coins: newCoins,
+                    completed: newCompleted.join(',')
+                };
+
+                // Send without awaiting, let it process in background
+                fetch(GAS_URL, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                }).catch(()=>{});
                 
-                if (user.lastPlayed !== todayStr) {
-                    if (user.lastPlayed === yesterdayStr) { user.streak++; } 
-                    else { user.streak = 1; }
+                // Update Local Storage
+                user.completedTasks = newCompleted;
+                user.coins = newCoins;
+                user.streak = newStreak;
+                if (!isLate) {
                     user.lastPlayed = todayStr;
                 }
                 
                 localStorage.setItem('tbay_security_user', JSON.stringify(user));
                 
-                if(redirectAfter) { closeOrRedirect(); } 
-                else { showToast('Task Completed! Coins recorded.'); setTimeout(renderDashboard, 800); }
+                if(redirectAfter) { 
+                    closeOrRedirect(); 
+                } 
+                else { 
+                    if (!isLate) {
+                        showToast(`Task Completed! +${COIN_REWARDS[dayIndex]} Coins recorded.`);
+                    } else {
+                        showToast(`Late Task Completed! (0 coins awarded)`);
+                    }
+                    setTimeout(renderDashboard, 800); 
+                }
             };
 
             if (filesData && filesData.length > 0) { processFiles([...filesData], [], executeGAS); } 
