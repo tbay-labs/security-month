@@ -46,7 +46,8 @@
         }
 
         .header-safe-area {
-            padding-top: max(16px, env(safe-area-inset-top));
+            /* Added extra buffer to push the header down below the notification area/notch */
+            padding-top: calc(max(24px, env(safe-area-inset-top)) + 16px);
         }
 
         /* Custom Scrollbar for Tasks */
@@ -55,7 +56,7 @@
         /* Toast Notification - FIXED TO HIDE COMPLETELY */
         #toast {
             position: fixed;
-            top: max(20px, env(safe-area-inset-top));
+            top: calc(max(24px, env(safe-area-inset-top)) + 16px);
             left: 50%;
             transform: translateX(-50%) translateY(-250%);
             opacity: 0;
@@ -343,17 +344,24 @@
             
             <!-- Header -->
             <div id="logo-container" class="flex items-center justify-center relative pb-6 pt-2 z-50 min-h-[44px]">
-                <button id="back-btn" onclick="closeAppPage()" class="hidden absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white active:bg-white/20 transition">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-                </button>
-                
                 <!-- Logo hidden by default, shown via JS if not iOS -->
                 <img id="tbay-logo" src="https://mcusercontent.com/4ceda90aa48260f0c3c397068/images/3089e9cb-945f-b383-b957-d5175b3d8c39.png" alt="Tbay" class="h-7 brightness-0 invert hidden">
             </div>
 
             <!-- Hero Content -->
             <div id="hero-intro" class="relative z-10 text-center">
-                <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">Week 1 | Loading...</span>
+                <div class="flex items-center justify-between mb-3 relative">
+                    <button id="back-btn" onclick="closeAppPage()" class="hidden text-white active:opacity-70 transition p-2 -ml-2" aria-label="Go Back">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <!-- Empty div to balance the flex layout and keep the badge centered when the back button is visible -->
+                    <div id="back-btn-spacer" class="hidden w-10"></div>
+                    
+                    <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mx-auto">Week 1 | Loading...</span>
+                    
+                     <!-- Empty div to balance the right side -->
+                    <div class="w-10"></div>
+                </div>
                 <h1 class="text-3xl font-black text-white mb-2 leading-tight flex items-center justify-center gap-2">
                     Security Streak
                     <button onclick="toggleTncModal()" class="text-tbCyan bg-white/10 rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold border border-tbCyan/50 active:bg-white/20 transition shrink-0" aria-label="Information">?</button>
@@ -485,7 +493,8 @@
         // OS Detection
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         if (isIOS) { 
-            document.getElementById('back-btn').style.display = 'flex'; 
+            document.getElementById('back-btn').style.display = 'block'; 
+            document.getElementById('back-btn-spacer').style.display = 'block';
         } else {
             document.getElementById('tbay-logo').style.display = 'block';
         }
@@ -921,7 +930,7 @@
                     html += `
                         <div class="bg-tbSurface rounded-xl p-4 mb-4 text-center">
                             <img src="${task.posterUrl}" class="rounded-lg shadow max-h-48 mx-auto mb-3">
-                            <a href="${task.posterUrl}" download="Tbay_Security_Poster.png" class="text-tbCyanDark font-bold text-sm underline active:opacity-70">Download Image</a>
+                            <a href="${task.posterUrl}" download="Tbay_Security_Poster.jpg" class="text-tbCyanDark font-bold text-sm underline active:opacity-70">Download Image</a>
                         </div>
                     `;
                 }
@@ -1117,29 +1126,22 @@
             };
 
             const executeGAS = (base64Images) => {
-                const campDay = getCampaignDay();
-                const isLate = dayIndex < campDay;
-                
+                // Calculate new streak state locally before saving
                 let newStreak = user.streak;
-                let newCoins = user.coins;
                 const todayStr = getTodayString();
                 
-                // Only grant coins and check-in streak if completed on the exact active day
-                if (!isLate) {
-                    newCoins += COIN_REWARDS[dayIndex];
-                    
-                    const lagosTimeStr = new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" });
-                    let lagosDate = new Date(lagosTimeStr);
-                    lagosDate.setDate(lagosDate.getDate() - 1);
-                    const yesterdayStr = `${lagosDate.getFullYear()}-${lagosDate.getMonth()+1}-${lagosDate.getDate()}`;
-                    
-                    if (user.lastPlayed !== todayStr) {
-                        if (user.lastPlayed === yesterdayStr) { newStreak++; } 
-                        else { newStreak = 1; }
-                    }
+                const lagosTimeStr = new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" });
+                let lagosDate = new Date(lagosTimeStr);
+                lagosDate.setDate(lagosDate.getDate() - 1);
+                const yesterdayStr = `${lagosDate.getFullYear()}-${lagosDate.getMonth()+1}-${lagosDate.getDate()}`;
+                
+                if (user.lastPlayed !== todayStr) {
+                    if (user.lastPlayed === yesterdayStr) { newStreak++; } 
+                    else { newStreak = 1; }
                 }
 
                 let newCompleted = [...user.completedTasks, dayIndex];
+                let newCoins = user.coins + COIN_REWARDS[dayIndex];
 
                 const payload = { 
                     action: 'submitTask', 
@@ -1164,23 +1166,12 @@
                 user.completedTasks = newCompleted;
                 user.coins = newCoins;
                 user.streak = newStreak;
-                if (!isLate) {
-                    user.lastPlayed = todayStr;
-                }
+                user.lastPlayed = todayStr;
                 
                 localStorage.setItem('tbay_security_user', JSON.stringify(user));
                 
-                if(redirectAfter) { 
-                    closeOrRedirect(); 
-                } 
-                else { 
-                    if (!isLate) {
-                        showToast(`Task Completed! +${COIN_REWARDS[dayIndex]} Coins recorded.`);
-                    } else {
-                        showToast(`Late Task Completed! (0 coins awarded)`);
-                    }
-                    setTimeout(renderDashboard, 800); 
-                }
+                if(redirectAfter) { closeOrRedirect(); } 
+                else { showToast('Task Completed! Coins recorded.'); setTimeout(renderDashboard, 800); }
             };
 
             if (filesData && filesData.length > 0) { processFiles([...filesData], [], executeGAS); } 
