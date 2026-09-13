@@ -46,14 +46,11 @@
         }
 
         .header-safe-area {
-            /* Added extra buffer to push the header down below the notification area/notch */
             padding-top: calc(max(24px, env(safe-area-inset-top)) + 16px);
         }
 
-        /* Custom Scrollbar for Tasks */
         .task-scroll::-webkit-scrollbar { width: 0px; }
         
-        /* Toast Notification - FIXED TO HIDE COMPLETELY */
         #toast {
             position: fixed;
             top: calc(max(24px, env(safe-area-inset-top)) + 16px);
@@ -72,7 +69,6 @@
             pointer-events: auto;
         }
 
-        /* Streak Timeline Dots */
         .streak-dot {
             width: 32px;
             height: 32px;
@@ -89,6 +85,8 @@
         .streak-dot.active { background: #00cccc; color: #00203a; box-shadow: 0 0 10px rgba(0,204,204,0.5); }
         .streak-dot.locked { background: #ffffff; color: #94a3b8; border: 2px solid #e2e8f0; }
         .streak-dot.completed { background: #10b981; color: white; border: 2px solid #10b981; }
+        .streak-dot.missed { background: #ffffff; color: #b45309; border: 2px solid #f59e0b; opacity: 1; }
+        .streak-dot.ring-active { box-shadow: 0 0 0 4px #ffffff, 0 0 0 7px #00cccc; }
         
         .streak-line {
             position: absolute;
@@ -105,7 +103,6 @@
             transition: width 0.5s ease;
         }
 
-        /* Form Elements */
         input[type="text"], textarea {
             width: 100%;
             padding: 14px;
@@ -137,7 +134,6 @@
             height: 100%;
         }
 
-        /* Multiple Image Upload Preview */
         .preview-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
@@ -172,7 +168,6 @@
             cursor: pointer;
         }
 
-        /* Loading Spinner */
         .loader {
             border: 3px solid rgba(255,255,255,0.3);
             border-top: 3px solid white;
@@ -184,21 +179,14 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Modal Animation */
         @keyframes popIn {
             0% { opacity: 0; transform: scale(0.95) translateY(10px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .modal-animate { animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         
-        /* New Dot States */
-        .streak-dot.missed { background: #ffffff; color: #b45309; border: 2px solid #f59e0b; opacity: 1; }
-        .streak-dot.ring-active { box-shadow: 0 0 0 4px #ffffff, 0 0 0 7px #00cccc; }
-        
-        /* Smooth height transitions */
         .shrink-header { padding-bottom: 24px !important; }
 
-        /* Disabled Button State */
         button:disabled {
             opacity: 0.5 !important;
             cursor: not-allowed !important;
@@ -209,12 +197,10 @@
 </head>
 <body>
 
-    <!-- Toast Notification -->
     <div id="toast" class="bg-tbDark text-white p-4 rounded-xl shadow-2xl flex items-center gap-3 border-l-4 border-tbCyan">
         <span id="toast-msg" class="font-semibold text-sm"></span>
     </div>
 
-    <!-- Help Modal -->
     <div id="help-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
         <div class="bg-white rounded-3xl max-w-[320px] w-full overflow-hidden shadow-2xl modal-animate">
             <div class="flex justify-between items-center p-4 border-b border-gray-100">
@@ -224,7 +210,6 @@
                 </button>
             </div>
             <div class="p-4 bg-gray-50 flex justify-center">
-                <!-- Helper Image -->
                 <img src="referral_guide.jpg" alt="How to copy referral code" class="max-h-[50vh] object-contain rounded-xl shadow-sm border border-gray-200">
             </div>
             <div class="px-5 pt-4 pb-2">
@@ -236,7 +221,6 @@
         </div>
     </div>
 
-    <!-- Terms & Conditions Modal -->
     <div id="tnc-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
         <div class="bg-white rounded-3xl max-w-[340px] w-full overflow-hidden shadow-2xl modal-animate">
             <div class="flex justify-between items-center p-5 border-b border-gray-100">
@@ -252,15 +236,14 @@
                 </div>
                 <div>
                     <h4 class="font-bold text-tbDark mb-1.5">How it works</h4>
-                    <p class="leading-relaxed">Complete one security task each day. Collect coins for eligible on-time tasks, which are credited on the reward distribution date. Complete all 7 tasks to qualify for the Grand Prize.</p>
+                    <p class="leading-relaxed">Complete one security task each day. Collect coins for each task completed on time, which are credited on the reward distribution date. Complete all 7 tasks to qualify for the Grand Prize.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-tbDark mb-1.5">Terms & Conditions</h4>
                     <ul class="space-y-3 mt-2">
                         <li><strong>1. Campaign Period:</strong> Starts September 8th, 2026, and ends September 14th, 2026.</li>
-                        <li><strong>2. Reward Distribution:</strong> All rewards, including coins and the Grand Prize coupons, will be calculated and released to eligible user accounts on <strong>17/09/2026</strong>.</li>
-                        <li><strong>3. Streaks & Missed Tasks:</strong> You only earn coins and a streak check-in by completing the active day's task. If you miss a task, you can still complete it later to qualify for the Grand Prize, but it will award 0 coins.</li>
-                        <li><strong>4. Eligibility:</strong> Only valid Tbay users who successfully submit legitimate screenshots and answers will qualify for rewards.</li>
+                        <li><strong>2. Reward Distribution:</strong> All rewards will be released on <strong>17/09/2026</strong>.</li>
+                        <li><strong>3. Streaks & Missed Tasks:</strong> If you miss a task on its scheduled day, you can still complete it later to qualify for the Grand Prize, but it awards 0 coins.</li>
                     </ul>
                 </div>
             </div>
@@ -270,7 +253,6 @@
         </div>
     </div>
 
-    <!-- Rewards Info Modal -->
     <div id="rewards-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
         <div class="bg-white rounded-3xl max-w-[340px] w-full overflow-hidden shadow-2xl modal-animate">
             <div class="flex justify-between items-center p-5 border-b border-gray-100">
@@ -280,43 +262,35 @@
                 </button>
             </div>
             <div class="p-5 space-y-4">
-                
-                <!-- Diamond/Ice Blue (7 Tasks) -->
                 <div class="bg-gradient-to-br from-[#c0f2f5] via-[#e6fbff] to-[#80deea] p-4 rounded-xl text-tbDark border border-[#80deea]/60 shadow-sm relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/50 blur-xl rounded-full pointer-events-none"></div>
                     <p class="text-[10px] font-black uppercase opacity-70 mb-0.5 tracking-wider">Complete 7 Tasks</p>
                     <p class="text-2xl font-black">₦250,000</p>
                     <p class="text-xs font-bold opacity-80 mt-1">In high-value trading coupons.</p>
                 </div>
-                
-                <!-- Platinum/Silver (6 Tasks) -->
                 <div class="bg-gradient-to-br from-[#e2e8f0] via-[#f8fafc] to-[#cbd5e1] p-4 rounded-xl text-slate-800 border border-slate-300/60 shadow-sm relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/60 blur-xl rounded-full pointer-events-none"></div>
                     <p class="text-[10px] font-black uppercase opacity-60 mb-0.5 tracking-wider">Complete 6 tasks</p>
                     <p class="text-2xl font-black">₦100,000</p>
                     <p class="text-xs font-bold opacity-70 mt-1">In high-value trading coupons.</p>
                 </div>
-
-                <!-- Gold/Yellow (5 Tasks) -->
                 <div class="bg-gradient-to-br from-[#fde047] via-[#fef9c3] to-[#f59e0b] p-4 rounded-xl text-yellow-900 border border-yellow-500/50 shadow-sm relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 w-20 h-20 bg-white/60 blur-xl rounded-full pointer-events-none"></div>
                     <p class="text-[10px] font-black uppercase opacity-70 mb-0.5 tracking-wider">Complete 5 tasks</p>
                     <p class="text-2xl font-black">₦50,000</p>
                     <p class="text-xs font-bold opacity-80 mt-1">In high-value trading coupons.</p>
                 </div>
-
                 <div class="bg-tbWarn/10 border border-tbWarn/30 p-3 rounded-xl flex items-center gap-3">
                     <div class="text-tbWarn text-2xl drop-shadow-sm">🪙</div>
                     <div>
                         <p class="text-sm font-bold text-yellow-800">Daily Coins</p>
-                        <p class="text-[11px] text-yellow-700 leading-snug mt-0.5">Earn up to 100 coins daily to use in gift card trading. <strong>1 Coin = 1 Naira</strong>.</p>
+                        <p class="text-[11px] text-yellow-700 leading-snug mt-0.5">Earn up to 100 coins daily. <strong>1 Coin = 1 Naira</strong>.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Change Code Modal -->
     <div id="change-code-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-tbDark/80 backdrop-blur-sm">
         <div class="bg-white rounded-3xl max-w-[320px] w-full overflow-hidden shadow-2xl modal-animate">
             <div class="p-5 border-b border-gray-100 flex justify-between items-center">
@@ -338,28 +312,23 @@
 
     <div class="app-container">
         
-        <!-- Combined Header & Hero Section -->
         <div id="main-header" class="header-safe-area bg-tbNavy px-6 pb-12 relative overflow-hidden rounded-b-[32px] shadow-sm shrink-0 transition-all duration-300">
             <div class="absolute -right-10 -top-10 w-40 h-40 bg-tbCyan rounded-full opacity-10 blur-2xl pointer-events-none"></div>
             
-            <!-- Header -->
             <div id="logo-container" class="flex items-center justify-center relative pb-6 pt-2 z-50 min-h-[44px]">
-                <!-- Logo hidden by default, shown via JS if not iOS -->
                 <img id="tbay-logo" src="https://mcusercontent.com/4ceda90aa48260f0c3c397068/images/3089e9cb-945f-b383-b957-d5175b3d8c39.png" alt="Tbay" class="h-7 brightness-0 invert hidden">
             </div>
 
-            <!-- Hero Content -->
             <div id="hero-intro" class="relative z-10 text-center">
                 <div class="flex items-center justify-between mb-3 relative">
                     <button id="back-btn" onclick="closeAppPage()" class="hidden text-white active:opacity-70 transition p-2 -ml-2" aria-label="Go Back">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
-                    <!-- Empty div to balance the flex layout and keep the badge centered when the back button is visible -->
+                    <!-- Empty div to balance flex layout -->
                     <div id="back-btn-spacer" class="hidden w-10"></div>
                     
                     <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mx-auto">Week 1 | Loading...</span>
                     
-                     <!-- Empty div to balance the right side -->
                     <div class="w-10"></div>
                 </div>
                 <h1 class="text-3xl font-black text-white mb-2 leading-tight flex items-center justify-center gap-2">
@@ -382,10 +351,8 @@
             </div>
         </div>
 
-        <!-- Main Content Area -->
         <div class="flex-1 px-6 -mt-6 relative z-20 flex flex-col pb-8 task-scroll overflow-y-auto">
             
-            <!-- VIEW 1: Registration Form -->
             <div id="view-register" class="bg-white rounded-2xl shadow-xl p-6 mb-6">
                 <h2 class="text-xl font-bold text-tbDark mb-2">Welcome!</h2>
                 <p class="text-gray-500 text-sm mb-6">To track your progress and send your rewards, please enter your Tbay referral code.</p>
@@ -404,16 +371,12 @@
                 </button>
             </div>
 
-            <!-- VIEW 2: Dashboard & Task Container -->
             <div id="view-dashboard" class="hidden flex-col gap-6">
-                
-                <!-- Simple Referral Code Display -->
                 <div class="text-center text-sm text-gray-500 relative z-20 mt-8 mb-2">
                     Registered referral code: <span id="dash-ref-code-span" class="font-bold text-tbDark">XXXXXX</span>
                     <button onclick="promptChangeCode()" class="ml-2 text-tbCyanDark font-black uppercase text-xs tracking-wider active:opacity-70 transition hover:underline">Change</button>
                 </div>
 
-                <!-- Pending Alert -->
                 <div id="pending-alert" class="hidden bg-white rounded-2xl shadow-xl p-5 items-start gap-4 border-t-4 border-tbWarn relative z-20">
                     <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center shrink-0 border border-yellow-100">
                         <span class="text-lg drop-shadow-sm">⚠️</span>
@@ -424,7 +387,6 @@
                     </div>
                 </div>
 
-                <!-- Streak Timeline -->
                 <div class="bg-white rounded-2xl shadow-xl p-6">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-bold text-tbDark">Your Streak: <span id="streak-count" class="text-tbCyanDark">0</span></h3>
@@ -440,57 +402,49 @@
                     <p class="text-center text-xs text-gray-400 font-semibold mt-2" id="streak-message">Click an unlocked day to view the task.</p>
                 </div>
 
-                <!-- Active Task Card -->
                 <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 border-t-4 border-tbCyan transition-all" id="task-card">
                     <!-- Task content injected here -->
                 </div>
             </div>
-
         </div>
 
-        <!-- Footer -->
         <div class="bg-tbDark text-white pt-8 pb-12 px-6 shrink-0 mt-auto rounded-t-3xl">
             <h4 class="text-center font-bold text-sm mb-4 text-white/60 uppercase tracking-widest">Official Channels</h4>
             <div class="flex justify-center gap-4 mb-8">
-                <!-- Social Icons -->
-                <a href="https://twitter.com/Theiabay" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
-                <a href="https://www.instagram.com/tbay__official/" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
-                <a href="https://www.facebook.com/tbayofficial/" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg></a>
+                <a href="https://www.facebook.com/tbayofficial/" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg></a>
+                <a href="https://twitter.com/Theiabay" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+                <a href="https://www.instagram.com/tbay__official/" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"/></svg></a>
                 <a href="https://www.tiktok.com/@tbayapp" target="_blank" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-tbCyan"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.41-3.24-3.46-5.62-.02-1.58.51-3.16 1.48-4.36 1.15-1.4 2.87-2.28 4.69-2.45v4.05c-.88.1-1.74.52-2.35 1.15-.65.65-.96 1.58-.87 2.49.09 1.05.69 2 1.56 2.53.86.53 1.95.66 2.92.42 1.12-.31 1.98-1.21 2.25-2.32.12-.48.16-1 .15-1.51-.02-3.84-.01-7.68-.02-11.52v-5.83z"/></svg></a>
             </div>
             
             <div class="flex gap-4 pb-safe">
-                <!-- App Store -->
                 <button onclick="closeOrRedirect()" class="flex-1 bg-white/10 py-3 rounded-xl flex items-center justify-center gap-2 active:bg-white/20 transition">
                     <img src="apple_icon.png" alt="App Store" class="w-5 h-5 object-contain brightness-0 invert">
                     <span class="text-xs font-bold">App Store</span>
                 </button>
-                <!-- Play Store -->
                 <button onclick="closeOrRedirect()" class="flex-1 bg-white/10 py-3 rounded-xl flex items-center justify-center gap-2 active:bg-white/20 transition">
                     <img src="play_icon.png" alt="Google Play" class="w-5 h-5 object-contain brightness-0 invert">
                     <span class="text-xs font-bold">Google Play</span>
                 </button>
             </div>
             
-            <!-- Campaign Details Text Link -->
             <div class="mt-8 text-center text-[11.5px] text-white/50 leading-relaxed px-2">
                 Want to learn more about how to win and the rules? <button onclick="toggleTncModal()" class="text-tbCyan underline active:text-white transition focus:outline-none">Read the campaign details & terms</button>.
             </div>
         </div>
-
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx7y0de0aZ8Nrf4GWZVKyZ1-D4V5WSmmsMTkD9TQcUN2-i8Al-ptrryiFGkL5GNY_rj/exec"; 
         
-        // Define Campaign Start and End Dates (Use ISO format with +01:00 to enforce Nigerian Time / WAT)
-        const CAMPAIGN_START = "2026-09-08T00:00:00+01:00"; 
-        const CAMPAIGN_END = "2026-09-14T23:59:59+01:00";
+        // Setup Cross-Campaign Synchronization with the Survey
+        const SURVEY_GAS_URL = "https://script.google.com/macros/s/AKfycbxGu9W8No4Sn3jJDIwhxWoSCjM6gH1WWXFDKF9FNQK3TRK5u1lATkxjt6NbyFNutax1/exec";
+        
+        const CAMPAIGN_START = "2026-09-02T00:00:00+01:00"; 
+        const CAMPAIGN_END = "2026-09-07T23:59:59+01:00";
         
         const COIN_REWARDS = [10, 10, 20, 40, 50, 60, 100];
         
-        // OS Detection
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         if (isIOS) { 
             document.getElementById('back-btn').style.display = 'block'; 
@@ -505,7 +459,6 @@
         let viewingDayIndex = 0; 
         let selectedFiles = []; 
 
-        // --- TASKS DEFINITION ---
         const TASKS = [
             {
                 day: 1,
@@ -533,7 +486,7 @@
                 type: "radio",
                 options: ["Less than 6 months ago", "More than 6 months ago"],
                 validate: (val) => {
-                    if(val === "More than 6 months ago") return { actionRequired: true, msg: "To complete this task, you must open the Tbay app and update BOTH your login password and transaction PIN right now.", btn: "Change Passwords to Complete Task" };
+                    if(val === "More than 6 months ago") return { actionRequired: true, msg: "To complete this task and earn your coins, you must open the Tbay app and update BOTH your login password and transaction PIN right now.", btn: "Change Passwords to Complete Task" };
                     return { actionRequired: false, msg: "Great job! Changing your passwords regularly keeps your funds safe." };
                 }
             },
@@ -572,7 +525,6 @@
             }
         ];
 
-        // --- UTILITY FUNCTIONS ---
         function toggleHelpModal() { document.getElementById('help-modal').classList.toggle('hidden'); }
         function toggleTncModal() { document.getElementById('tnc-modal').classList.toggle('hidden'); }
         function toggleRewardsModal() { document.getElementById('rewards-modal').classList.toggle('hidden'); }
@@ -601,7 +553,6 @@
 
         function closeOrRedirect() { closeAppPage(); }
 
-        // Always get the current date specifically in Nigerian Time (WAT)
         function getTodayString() {
             const lagosTimeStr = new Date().toLocaleString("en-US", { timeZone: "Africa/Lagos" });
             const dateObj = new Date(lagosTimeStr);
@@ -609,23 +560,18 @@
         }
 
         function getCampaignDay() {
-            // Absolute timestamps handle timezones automatically when calculating the difference
             const startDate = new Date(CAMPAIGN_START);
             const now = new Date();
             const diffTime = now - startDate;
-            
-            if (diffTime < 0) return -1; // Campaign has not started yet
-            
-            // 24 hours exactly in milliseconds
+            if (diffTime < 0) return -1; 
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            return Math.min(diffDays, 6); // Max out at index 6 (Day 7)
+            return Math.min(diffDays, 6); 
         }
 
         function uuidv4() {
             return 'tbay_sec_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
         }
 
-        // --- IMAGE COMPRESSION ---
         function compressImage(file, callback) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -648,7 +594,6 @@
         }
 
         function init() {
-            // Dynamically set the header badge based on config
             const startD = new Date(CAMPAIGN_START);
             const endD = new Date(CAMPAIGN_END);
             const startStr = startD.toLocaleDateString('en-GB', { month: 'short', day: '2-digit' });
@@ -664,9 +609,8 @@
                 document.getElementById('view-dashboard').classList.add('flex');
                 
                 const campDay = getCampaignDay();
-                viewingDayIndex = Math.max(0, campDay); // Default to viewing Day 1 even if locked
+                viewingDayIndex = Math.max(0, campDay); 
                 
-                // Find earliest uncompleted task up to the current unlocked day
                 for (let i = 0; i <= campDay; i++) {
                     if (!user.completedTasks.includes(i)) { viewingDayIndex = i; break; }
                 }
@@ -681,12 +625,33 @@
             document.getElementById('view-dashboard').classList.remove('hidden');
             document.getElementById('view-dashboard').classList.add('flex');
             
-            // Hide Hero Logo and Titles, shrink the header
             document.getElementById('logo-container').style.display = 'none';
             document.getElementById('hero-intro').style.display = 'none';
             document.getElementById('main-header').classList.add('shrink-header');
             
             updateReferralUI();
+
+            // Retroactive Sync: Check if they previously did the survey but had no code
+            try {
+                const surveyUid = localStorage.getItem('tbay_survey_uid');
+                const isSynced = localStorage.getItem('tbay_cross_synced');
+                
+                if (surveyUid && user && user.code && !isSynced) {
+                    fetch(SURVEY_GAS_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: 'syncRetroactiveCode',
+                            userId: surveyUid, 
+                            referralCode: user.code
+                        })
+                    }).then(res => res.json()).then(data => {
+                        if (data.status === 'success') {
+                            localStorage.setItem('tbay_cross_synced', 'true');
+                        }
+                    }).catch(e => console.error("Cross-sync error", e));
+                }
+            } catch(e) {}
         }
 
         function updateReferralUI() {
@@ -718,7 +683,6 @@
             btn.disabled = true; loader.style.display = 'block';
 
             try {
-                // Must use text/plain for Google Apps Script CORS redirects
                 const response = await fetch(GAS_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -726,7 +690,6 @@
                 });
                 
                 const result = await response.json();
-                
                 btn.disabled = false; loader.style.display = 'none';
 
                 if(result.status === 'error' && result.message === 'duplicate') {
@@ -750,17 +713,15 @@
         async function registerUser() {
             const code = document.getElementById('referral-input').value.trim();
             
-            // 1. Check whether the code meets the exact 6 digits criteria
             if(!code) return showToast('Please enter your referral code.', true);
             if(code.length !== 6) return showToast('Invalid referral code. Please check again.', true);
             
-            // 2. Check if the browser storage already has a referral code
             const storedUserRaw = localStorage.getItem('tbay_security_user');
             if (storedUserRaw) {
                 const storedUser = JSON.parse(storedUserRaw);
                 if (storedUser && storedUser.code) {
                     showToast('You are already registered! Loading dashboard...');
-                    init(); // Auto-load the dashboard
+                    init(); 
                     return;
                 }
             }
@@ -769,13 +730,10 @@
             const loader = document.getElementById('loader-register');
             btn.disabled = true; loader.style.display = 'block';
             
-            // Only generate a new ID if one doesn't exist
             if(!user.id) user.id = uuidv4();
             user.changesLeft = 3; 
             
-            // 3. Check the google sheet whether the code is already there
             try {
-                // Must use text/plain for Google Apps Script CORS redirects
                 const response = await fetch(GAS_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -792,12 +750,10 @@
                 if(result.status === 'success') {
                     user.code = code;
                     user.completedTasks = [];
-                    // Store the code to the browser
                     localStorage.setItem('tbay_security_user', JSON.stringify(user));
                     
                     showToast('Welcome to Security Month!');
                     setTimeout(() => {
-                        // Proceed to tasks
                         switchToDashboard();
                         const campDay = getCampaignDay();
                         viewingDayIndex = Math.max(0, campDay);
@@ -853,7 +809,6 @@
                 let isMissed = isPending && i < campDay;
                 let textStyle = i === viewingDayIndex ? 'text-tbCyan font-bold' : 'text-gray-400';
                 
-                // Add the red strikethrough for missed tasks to show they are voided
                 if (isMissed) textStyle += ' line-through decoration-red-500 decoration-2 opacity-70';
                 
                 coinTag.className = `absolute -bottom-6 text-[10px] whitespace-nowrap transition-all ${textStyle}`;
@@ -1126,7 +1081,6 @@
             };
 
             const executeGAS = (base64Images) => {
-                // Calculate new streak state locally before saving
                 let newStreak = user.streak;
                 const todayStr = getTodayString();
                 
@@ -1135,13 +1089,24 @@
                 lagosDate.setDate(lagosDate.getDate() - 1);
                 const yesterdayStr = `${lagosDate.getFullYear()}-${lagosDate.getMonth()+1}-${lagosDate.getDate()}`;
                 
-                if (user.lastPlayed !== todayStr) {
-                    if (user.lastPlayed === yesterdayStr) { newStreak++; } 
-                    else { newStreak = 1; }
+                // Only increment streak and grant coins if completed on the exact active day
+                const campDay = getCampaignDay();
+                let earnedCoinsForThisTask = 0;
+
+                if (dayIndex === campDay) {
+                    earnedCoinsForThisTask = COIN_REWARDS[dayIndex];
+                    if (user.lastPlayed !== todayStr) {
+                        if (user.lastPlayed === yesterdayStr) { newStreak++; } 
+                        else { newStreak = 1; }
+                    }
+                } else if (dayIndex < campDay) {
+                    // Late task: 0 coins, streak resets to 1 as penalty for missing a day
+                    earnedCoinsForThisTask = 0;
+                    if (user.lastPlayed !== todayStr) { newStreak = 1; }
                 }
 
                 let newCompleted = [...user.completedTasks, dayIndex];
-                let newCoins = user.coins + COIN_REWARDS[dayIndex];
+                let newCoins = user.coins + earnedCoinsForThisTask;
 
                 const payload = { 
                     action: 'submitTask', 
@@ -1155,14 +1120,12 @@
                     completed: newCompleted.join(',')
                 };
 
-                // Send without awaiting, let it process in background
                 fetch(GAS_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify(payload)
                 }).catch(()=>{});
                 
-                // Update Local Storage
                 user.completedTasks = newCompleted;
                 user.coins = newCoins;
                 user.streak = newStreak;
@@ -1171,7 +1134,7 @@
                 localStorage.setItem('tbay_security_user', JSON.stringify(user));
                 
                 if(redirectAfter) { closeOrRedirect(); } 
-                else { showToast('Task Completed! Coins recorded.'); setTimeout(renderDashboard, 800); }
+                else { showToast('Task Completed! Recorded.'); setTimeout(renderDashboard, 800); }
             };
 
             if (filesData && filesData.length > 0) { processFiles([...filesData], [], executeGAS); } 
