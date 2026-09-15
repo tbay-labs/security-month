@@ -49,7 +49,6 @@
             padding-top: max(16px, env(safe-area-inset-top));
         }
 
-        /* */
         input[type="text"], textarea {
             width: 100%; 
             padding: 16px 20px; 
@@ -90,7 +89,6 @@
         .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
         .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; height: 100%; }
         
-        /* */
         .check-card input[type="checkbox"], .radio-card input[type="radio"] {
             width: 20px; height: 20px; accent-color: #00cccc; flex-shrink: 0; cursor: pointer;
         }
@@ -118,10 +116,9 @@
                 Extended | Sep 15 - Sep 21
             </div>
             <h1 class="text-3xl font-black text-white mb-2 leading-tight">September<br>Security Streak</h1>
-            <p class="text-sm text-white/80 leading-relaxed max-w-[280px]">Complete a quick daily task to earn coins and win a share of the ₦250,000 Grand Prize.</p>
+            <p class="text-sm text-white/80 leading-relaxed max-w-[280px]">Complete a quick daily task to earn coins and win a share of the ₦250,000 Coupon Bundle.</p>
         </div>
 
-        <!-- -->
         <div id="view-register" class="flex-1 overflow-y-auto px-6 py-8 relative">
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
                 <div class="w-16 h-16 bg-tbCyan/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-tbCyan/30">
@@ -143,7 +140,7 @@
                 <ul class="space-y-3 mt-3 text-sm text-gray-600">
                     <li class="flex items-start gap-2"><b>1.</b> <span><strong>Campaign Period:</strong> Starts September 15th, 2026, and ends September 21st, 2026.</span></li>
                     <li class="flex items-start gap-2"><b>2.</b> <span><strong>Reward Distribution:</strong> All rewards will be released on <strong>23/09/2026</strong>.</span></li>
-                    <li class="flex items-start gap-2"><b>3.</b> <span><strong>Streaks & Missed Tasks:</strong> If you miss a task on its scheduled day, you can still complete it later to qualify for the Grand Prize, but it awards 0 coins.</span></li>
+                    <li class="flex items-start gap-2"><b>3.</b> <span><strong>Grand Prize & Missed Tasks:</strong> Complete all 7 tasks to qualify for the ₦250,000 Coupon Bundle. If you miss a task, complete it later to remain eligible for the bundle (awards 0 daily coins).</span></li>
                 </ul>
             </div>
         </div>
@@ -162,7 +159,6 @@
             <button onclick="closeAppPage()" class="w-full bg-tbDark text-white font-bold py-4 rounded-xl active:scale-95 transition">Return to App</button>
         </div>
 
-        <!-- -->
         <div id="view-dashboard" class="flex-1 overflow-y-auto px-6 py-6 hidden relative">
             
             <!-- User Stats -->
@@ -195,11 +191,23 @@
             <div id="tasks-container" class="space-y-4">
                 <!-- Tasks injected here by JS -->
             </div>
+            
+            <!-- Dashboard Rules Section -->
+            <div class="mt-8 bg-tbSurface border border-gray-200 rounded-2xl p-5 mb-6">
+                <h4 class="font-bold text-tbDark mb-2 text-sm flex items-center gap-2">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                    Campaign Rules & Rewards
+                </h4>
+                <ul class="space-y-3 text-xs text-gray-600">
+                    <li class="flex items-start gap-2"><span class="text-tbCyanDark mt-0.5">•</span> <span><strong>Grand Prize:</strong> Complete all 7 tasks before the campaign ends to qualify for a share of the <strong>₦250,000 Coupon Bundle</strong>.</span></li>
+                    <li class="flex items-start gap-2"><span class="text-tbCyanDark mt-0.5">•</span> <span><strong>Missed Tasks:</strong> If you miss a task on its scheduled day, you can still complete it later to maintain your eligibility for the Grand Prize Coupon Bundle, but it will award 0 daily coins.</span></li>
+                    <li class="flex items-start gap-2"><span class="text-tbCyanDark mt-0.5">•</span> <span><strong>Distribution:</strong> All Coins and Coupon Bundles will be credited to winning accounts on <strong>23/09/2026</strong>.</span></li>
+                </ul>
+            </div>
         </div>
 
     </div>
 
-    <!-- -->
     <script>
         // --- CONFIGURATION ---
         const GAS_URL = "https://script.google.com/macros/s/AKfycbx7y0de0aZ8Nrf4GWZVKyZ1-D4V5WSmmsMTkD9TQcUN2-i8Al-ptrryiFGkL5GNY_rj/exec"; 
@@ -474,7 +482,24 @@
             
             if (dayIndex === 0) {
                 formHtml = `
-                    <p class="text-sm font-bold text-tbDark mb-2">Upload 1-5 screenshots proving you followed our channels.</p>
+                    <div class="mb-4">
+                        <p class="text-sm font-bold text-tbDark mb-2">1. Follow our official channels:</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a href="https://www.facebook.com/theiabay/" target="_blank" class="flex justify-center items-center gap-2 p-2.5 bg-[#1877F2]/10 text-[#1877F2] rounded-xl text-xs font-bold border border-[#1877F2]/20 active:scale-95 transition">
+                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"></path></svg> Facebook
+                            </a>
+                            <a href="https://www.instagram.com/tbay_exchange/" target="_blank" class="flex justify-center items-center gap-2 p-2.5 bg-[#E4405F]/10 text-[#E4405F] rounded-xl text-xs font-bold border border-[#E4405F]/20 active:scale-95 transition">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg> Instagram
+                            </a>
+                            <a href="https://twitter.com/tbay_exchange" target="_blank" class="flex justify-center items-center gap-2 p-2.5 bg-gray-100 text-gray-800 rounded-xl text-xs font-bold border border-gray-200 active:scale-95 transition">
+                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18.9 3h-3.4l-5.6 7L3 3h3.4l5.6 7 6.9-7zm-1.8 16h3.4l-9.4-11.8H7.7l9.4 11.8z"></path></svg> Twitter (X)
+                            </a>
+                            <a href="https://t.me/tbay_exchange" target="_blank" class="flex justify-center items-center gap-2 p-2.5 bg-[#0088cc]/10 text-[#0088cc] rounded-xl text-xs font-bold border border-[#0088cc]/20 active:scale-95 transition">
+                                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg> Telegram
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-sm font-bold text-tbDark mb-2">2. Upload 1-5 screenshots proving you followed:</p>
                     <div class="file-upload-wrapper bg-tbSurface border-2 border-dashed border-gray-300 rounded-xl p-6 text-center mb-4">
                         <p class="text-sm font-bold text-tbCyanDark" id="file-name-display-0">Tap to attach screenshots</p>
                         <input type="file" id="task-file-0" accept="image/*" multiple onchange="handleFileSelect(this, 0, 5)">
