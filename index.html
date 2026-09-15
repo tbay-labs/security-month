@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#003152">
-    <title>September Security Streak - Week 1</title>
+    <title>September Security Streak - Week 2</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -327,7 +327,7 @@
                     <!-- Empty div to balance flex layout -->
                     <div id="back-btn-spacer" class="hidden w-10"></div>
                     
-                    <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mx-auto">Week 1 | Loading...</span>
+                    <span id="campaign-date-badge" class="inline-block bg-tbWarn/20 text-tbWarn px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mx-auto">Week 2 | Loading...</span>
                     
                     <div class="w-10"></div>
                 </div>
@@ -598,7 +598,7 @@
             const endD = new Date(CAMPAIGN_END);
             const startStr = startD.toLocaleDateString('en-GB', { month: 'short', day: '2-digit' });
             const endStr = endD.toLocaleDateString('en-GB', { month: 'short', day: '2-digit', year: 'numeric' });
-            document.getElementById('campaign-date-badge').innerText = `Week 1 | ${startStr} - ${endStr}`;
+            document.getElementById('campaign-date-badge').innerText = `Week 2 | ${startStr} - ${endStr}`;
 
             const storedUser = localStorage.getItem('tbay_security_user');
             if (storedUser) {
